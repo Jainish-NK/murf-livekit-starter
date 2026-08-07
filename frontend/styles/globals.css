@@ -6,71 +6,118 @@
 
 :root {
   --radius: 0.625rem;
-  --background: oklch(1 0 0);
+
+  /* 🇮🇳 Indian Flag Theme Colors */
+  --saffron: oklch(0.75 0.19 55);
+  --saffron-deep: oklch(0.68 0.2 45);
+  --flag-white: oklch(1 0 0);
+  --india-green: oklch(0.55 0.15 145);
+  --india-green-deep: oklch(0.45 0.14 145);
+  --chakra-blue: oklch(0.45 0.15 260);
+
+  --background:
+    radial-gradient(circle at 20% 15%, oklch(0.8 0.17 60 / 55%) 0%, transparent 45%),
+    radial-gradient(circle at 80% 85%, oklch(0.6 0.16 145 / 55%) 0%, transparent 45%),
+    radial-gradient(circle at 50% 50%, oklch(0.55 0.12 250 / 15%) 0%, transparent 60%),
+    linear-gradient(
+      135deg,
+      var(--saffron) 0%,
+      oklch(0.85 0.1 80) 22%,
+      var(--flag-white) 45%,
+      oklch(0.82 0.08 160) 68%,
+      var(--india-green) 100%
+    );
   --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
+
+  --card: oklch(1 0 0 / 92%);
   --card-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
+
+  --primary: var(--saffron-deep);
   --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
+
+  --secondary: var(--india-green);
+  --secondary-foreground: oklch(0.985 0 0);
+
   --muted: oklch(0.97 0 0);
   --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
+
+  --accent: var(--chakra-blue);
+  --accent-foreground: oklch(0.985 0 0);
+
   --destructive: oklch(0.577 0.245 27.325);
   --border: oklch(0.922 0 0);
   --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
+  --ring: var(--chakra-blue);
+
+  --chart-1: var(--saffron);
+  --chart-2: var(--flag-white);
+  --chart-3: var(--india-green);
+  --chart-4: var(--chakra-blue);
   --chart-5: oklch(0.769 0.188 70.08);
+
   --sidebar: oklch(0.985 0 0);
   --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
+  --sidebar-primary: var(--saffron-deep);
   --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
+  --sidebar-accent: var(--india-green);
+  --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  --sidebar-ring: var(--chakra-blue);
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
+  --background:
+    radial-gradient(circle at 15% 20%, oklch(0.5 0.16 55 / 45%) 0%, transparent 50%),
+    radial-gradient(circle at 85% 80%, oklch(0.4 0.13 145 / 45%) 0%, transparent 50%),
+    radial-gradient(circle at 50% 50%, oklch(0.4 0.14 260 / 20%) 0%, transparent 60%),
+    linear-gradient(
+      135deg,
+      var(--saffron-deep) 0%,
+      oklch(0.35 0.06 60) 30%,
+      oklch(0.22 0 0) 50%,
+      oklch(0.32 0.05 150) 70%,
+      var(--india-green-deep) 100%
+    );
   --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
+
+  --card: oklch(0.205 0 0 / 92%);
   --card-foreground: oklch(0.985 0 0);
   --popover: oklch(0.269 0 0);
   --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
+
+  --primary: var(--saffron);
+  --primary-foreground: oklch(0.145 0 0);
+
+  --secondary: var(--india-green-deep);
   --secondary-foreground: oklch(0.985 0 0);
+
   --muted: oklch(0.269 0 0);
   --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.371 0 0);
+
+  --accent: var(--chakra-blue);
   --accent-foreground: oklch(0.985 0 0);
+
   --destructive: oklch(0.704 0.191 22.216);
   --border: oklch(1 0 0 / 10%);
   --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
+  --ring: var(--chakra-blue);
+
+  --chart-1: var(--saffron);
+  --chart-2: oklch(0.9 0 0);
+  --chart-3: var(--india-green);
+  --chart-4: var(--chakra-blue);
   --chart-5: oklch(0.645 0.246 16.439);
+
   --sidebar: oklch(0.205 0 0);
   --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
+  --sidebar-primary: var(--saffron);
+  --sidebar-primary-foreground: oklch(0.145 0 0);
+  --sidebar-accent: var(--india-green-deep);
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.439 0 0);
+  --sidebar-ring: var(--chakra-blue);
 }
 
 @theme inline {
@@ -119,6 +166,23 @@
     @apply border-foreground/20 outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground;
+    background: var(--background);
+    background-attachment: fixed;
+    background-size: 200% 200%;
+    animation: flag-drift 18s ease-in-out infinite;
+    min-height: 100vh;
+    @apply text-foreground;
+  }
+
+  @keyframes flag-drift {
+    0% {
+      background-position: 0% 0%;
+    }
+    50% {
+      background-position: 100% 100%;
+    }
+    100% {
+      background-position: 0% 0%;
+    }
   }
 }
