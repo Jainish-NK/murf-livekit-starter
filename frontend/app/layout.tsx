@@ -1,15 +1,23 @@
-import { Public_Sans } from 'next/font/google';
+import type { Metadata } from 'next';
+import { Inter, Poppins } from 'next/font/google';
 import localFont from 'next/font/local';
 import { headers } from 'next/headers';
 import { ThemeProvider } from '@/components/app/theme-provider';
-import { ThemeToggle } from '@/components/app/theme-toggle';
 import { cn } from '@/lib/shadcn/utils';
 import { getAppConfig, getStyles } from '@/lib/utils';
 import '@/styles/globals.css';
 
-const publicSans = Public_Sans({
-  variable: '--font-public-sans',
+const inter = Inter({
+  variable: '--font-inter',
   subsets: ['latin'],
+  display: 'swap',
+});
+
+const poppins = Poppins({
+  variable: '--font-poppins',
+  subsets: ['latin'],
+  weight: ['500', '600', '700', '800'],
+  display: 'swap',
 });
 
 const commitMono = localFont({
@@ -39,6 +47,20 @@ const commitMono = localFont({
   ],
 });
 
+export async function generateMetadata(): Promise<Metadata> {
+  const hdrs = await headers();
+  const appConfig = await getAppConfig(hdrs);
+
+  return {
+    metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'),
+    title: appConfig.pageTitle || 'SehatSaathi AI — Voice for Bharat',
+    description: appConfig.pageDescription,
+    icons: {
+      icon: '/sehatsaathi-mark.svg',
+    },
+  };
+}
+
 interface RootLayoutProps {
   children: React.ReactNode;
 }
@@ -47,63 +69,24 @@ export default async function RootLayout({ children }: RootLayoutProps) {
   const hdrs = await headers();
   const appConfig = await getAppConfig(hdrs);
   const styles = getStyles(appConfig);
-  const { pageTitle, pageDescription, companyName, logo, logoDark } = appConfig;
 
   return (
     <html
       lang="en"
       suppressHydrationWarning
-      className={cn(
-        publicSans.variable,
-        commitMono.variable,
-        'scroll-smooth font-sans antialiased'
-      )}
+      className={cn(inter.variable, poppins.variable, commitMono.variable, 'antialiased')}
     >
       <head>
         {styles && <style>{styles}</style>}
-        <title>{pageTitle}</title>
-        <meta name="description" content={pageDescription} />
       </head>
-      <body className="overflow-x-hidden">
+      <body className="overflow-x-hidden font-sans min-h-screen bg-background text-foreground transition-colors duration-300">
         <ThemeProvider
           attribute="class"
-          defaultTheme="system"
-          enableSystem
+          defaultTheme="light"
+          enableSystem={false}
           disableTransitionOnChange
         >
-          <header className="fixed top-0 left-0 z-50 hidden w-full flex-row justify-between p-6 md:flex">
-            <a
-              target="_blank"
-              rel="noopener noreferrer"
-              href="https://livekit.io"
-              className="scale-100 transition-transform duration-300 hover:scale-110"
-            >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={logo} alt={`${companyName} Logo`} className="block size-6 dark:hidden" />
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={logoDark ?? logo}
-                alt={`${companyName} Logo`}
-                className="hidden size-6 dark:block"
-              />
-            </a>
-            <span className="text-foreground font-mono text-xs font-bold tracking-wider uppercase">
-              Built with{' '}
-              <a
-                target="_blank"
-                rel="noopener noreferrer"
-                href="https://docs.livekit.io/agents"
-                className="underline underline-offset-4"
-              >
-                LiveKit Agents
-              </a>
-            </span>
-          </header>
-
           {children}
-          <div className="group fixed bottom-0 left-1/2 z-50 mb-2 -translate-x-1/2">
-            <ThemeToggle className="translate-y-20 transition-transform delay-150 duration-300 group-hover:translate-y-0" />
-          </div>
         </ThemeProvider>
       </body>
     </html>

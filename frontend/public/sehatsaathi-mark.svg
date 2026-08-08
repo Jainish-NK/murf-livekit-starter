@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <defs>
+    <!-- Rich Tricolor Blended Background Gradient (Saffron -> White -> Green) -->
+    <linearGradient id="ss-blend-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FF9933" />
+      <stop offset="48%" stop-color="#FFFFFF" />
+      <stop offset="100%" stop-color="#138808" />
+    </linearGradient>
+
+    <!-- Inner Soft Ring Gradient -->
+    <linearGradient id="ss-ring-grad" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#138808" />
+      <stop offset="50%" stop-color="#FFFFFF" />
+      <stop offset="100%" stop-color="#FF9933" />
+    </linearGradient>
+
+    <!-- Mic & Leaf Core Gradient -->
+    <linearGradient id="ss-mic-grad" x1="20%" y1="20%" x2="80%" y2="80%">
+      <stop offset="0%" stop-color="#FF9933" />
+      <stop offset="50%" stop-color="#FFFFFF" />
+      <stop offset="100%" stop-color="#10B981" />
+    </linearGradient>
+  </defs>
+
+  <!-- Outer Circle with Tricolor Blend Fill & Border -->
+  <circle cx="32" cy="32" r="30" fill="url(#ss-blend-bg)" />
+  <circle cx="32" cy="32" r="29" stroke="url(#ss-ring-grad)" stroke-width="1.5" opacity="0.85" />
+
+  <!-- Inner Concentric Ring -->
+  <circle cx="32" cy="32" r="22" stroke="#FFFFFF" stroke-width="1.2" opacity="0.75" stroke-dasharray="3 2" />
+
+  <!-- Leaf / Healthcare Cross Motif Overlay in Soft Navy / Green -->
+  <path d="M32 16 V48 M16 32 H48" stroke="#102A43" stroke-width="1.5" stroke-linecap="round" opacity="0.18" />
+
+  <!-- Solid Center Pod for High Contrast & Definition -->
+  <circle cx="32" cy="32" r="16" fill="#102A43" fill-opacity="0.88" />
+
+  <!-- Microphone & Healthcare Heart Cross Composite (White with Saffron/Green Tips) -->
+  <!-- Mic Capsule -->
+  <rect x="27.5" y="21" width="9" height="15" rx="4.5" fill="#FFFFFF" />
+
+  <!-- Microphone Cradle -->
+  <path d="M23.5 29 C23.5 34.5 27 38.5 32 38.5 C37 38.5 40.5 34.5 40.5 29" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round" fill="none" />
+
+  <!-- Microphone Base Stem -->
+  <path d="M32 38.5 V43 M27 43 H37" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round" />
+
+  <!-- Orange Saffron Accent Dot on Top Left -->
+  <circle cx="23" cy="21" r="2.2" fill="#FF9933" />
+  <!-- Green Accent Dot on Bottom Right -->
+  <circle cx="41" cy="43" r="2.2" fill="#10B981" />
+</svg>
