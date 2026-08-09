@@ -31,3 +31,7 @@ KMS
 
 # GitHub CLI
 .github/personal-instructions.md
+
+data/memory.db
+
+src/agent_day3_backup.py

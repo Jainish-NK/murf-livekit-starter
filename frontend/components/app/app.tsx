@@ -11,7 +11,7 @@ import { ViewController } from '@/components/app/view-controller';
 import { Toaster } from '@/components/ui/sonner';
 import { useAgentErrors } from '@/hooks/useAgentErrors';
 import { useDebugMode } from '@/hooks/useDebug';
-import { getSandboxTokenSource } from '@/lib/utils';
+import { getCallerId } from '@/lib/utils';
 
 const IN_DEVELOPMENT = process.env.NODE_ENV !== 'production';
 
@@ -28,11 +28,40 @@ interface AppProps {
 
 export function App({ appConfig }: AppProps) {
   const tokenSource = useMemo(() => {
-    return typeof process.env.NEXT_PUBLIC_CONN_DETAILS_ENDPOINT === 'string'
-      ? getSandboxTokenSource(appConfig)
-      : TokenSource.endpoint('/api/token');
-  }, [appConfig]);
+    return TokenSource.custom(async () => {
+      const callerId = getCallerId();
 
+      console.log('SehatSaathi Caller ID:', callerId);
+
+      const response = await fetch('/api/token', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          caller_id: callerId,
+          ...(appConfig.agentName
+            ? {
+                room_config: {
+                  agents: [
+                    {
+                      agent_name: appConfig.agentName,
+                    },
+                  ],
+                },
+              }
+            : {}),
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(await response.text());
+      }
+
+      return await response.json();
+    });
+  }, [appConfig]);
+  
   const session = useSession(
     tokenSource,
     appConfig.agentName ? { agentName: appConfig.agentName } : undefined

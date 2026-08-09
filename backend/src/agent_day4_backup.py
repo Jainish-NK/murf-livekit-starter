@@ -8,25 +8,20 @@ from livekit.agents import (
     AgentSession,
     JobContext,
     JobProcess,
-    RunContext,
     cli,
-    function_tool,
     inference,
     tokenize,
     room_io,
 )
 from livekit.plugins import murf, silero, google, deepgram, noise_cancellation
 from livekit.plugins.turn_detector.multilingual import MultilingualModel
-from memory.memory_service import (
-    lookup_caller,
-    save_caller,
-    forget_caller,
-)
 
 logger = logging.getLogger("agent")
 
 load_dotenv(".env.local")
 
+# Change this prompt to change what your voice agent does.
+# See README.md for example prompts (customer support, language tutor, receptionist).
 SYSTEM_PROMPT = """
 # IDENTITY
 You are Anisha, the warm and professional AI receptionist for Sunrise Family Clinic.
@@ -314,178 +309,14 @@ Be concise without being dismissive.
 Be safe without sounding robotic.
 You are not here to replace a doctor.
 You are here to make accessing Sunrise Family Clinic easier, safer, and more human.
-
-
-# MEMORY
-You have access to three memory tools:
-- lookup_caller_memory
-- save_caller_memory
-- forget_my_memory
-
-At the beginning of a conversation, use lookup_caller_memory when
-caller memory is relevant or when you need to determine whether
-the caller is returning.
-
-If the tool finds a caller, greet them naturally by name.
-
-Never invent or assume stored information.
-
-Before saving any caller information, explicitly ask:
-"Would you like me to remember that for future calls?"
-
-Only call save_caller_memory after a clear yes.
-
-If the caller says no, do not call the save tool.
-
-Only save small, non-sensitive information that is useful for
-future clinic interactions.
-
-Never save detailed medical notes, diagnoses, prescriptions,
-lab results, passwords, OTPs, payment information, or detailed
-symptom descriptions.
-
-If the caller asks you to forget their saved information,
-call forget_my_memory.
-
-Never claim that information was saved, updated, or deleted
-unless the corresponding tool confirms success.
-
-When memory is unavailable, continue the conversation normally.
-Never invent a memory result.
 """
-
-
 class Assistant(Agent):
-
-    def __init__(self, user_id: str | None = None) -> None:
+    def __init__(self) -> None:
         super().__init__(instructions=SYSTEM_PROMPT)
-        # Fallback identity used only when a real room participant
-        # identity isn't available yet (e.g. local/dev testing).
-        self._fallback_user_id = user_id
 
-    # -----------------------------------------------------
-    # GET CURRENT CALLER ID
-    # -----------------------------------------------------
-    def _get_caller_id(self, context: RunContext) -> str | None:
-        """
-        Get the persistent caller ID.
-
-        Prefers the identity stored in session.userdata (set once at
-        connection time in my_agent()), and falls back to the
-        constructor-provided test user_id if that isn't available.
-        """
-        userdata = getattr(context.session, "userdata", None)
-        if userdata and userdata.get("caller_id"):
-            return userdata["caller_id"]
-
-        return self._fallback_user_id
-
-    # -----------------------------------------------------
-    # LOOKUP MEMORY
-    # -----------------------------------------------------
-    @function_tool()
-    async def lookup_caller_memory(self, context: RunContext) -> dict:
-        """
-        Look up the current caller's saved memory.
-
-        Use this when determining whether the caller is returning
-        and when previous information is useful for the conversation.
-        Never invent memory.
-        """
-        caller_id = self._get_caller_id(context)
-
-        if not caller_id:
-            return {
-                "found": False,
-                "message": "Caller identity is unavailable.",
-            }
-
-        logger.info("Looking up caller memory: %s", caller_id)
-        result = lookup_caller(caller_id)
-        logger.info("Caller memory found=%s", result.get("found"))
-        return result
-
-    # -----------------------------------------------------
-    # SAVE MEMORY
-    # -----------------------------------------------------
-    @function_tool()
-    async def save_caller_memory(
-        self,
-        context: RunContext,
-        name: str,
-        language_preference: str | None = None,
-        facts: dict | None = None,
-        consent_confirmed: bool = False,
-    ) -> dict:
-        """
-        Save caller memory only after explicit consent.
-
-        The caller must clearly agree before this tool is used with
-        consent_confirmed=True.
-
-        Never save: diagnoses, symptoms, prescriptions, medicines,
-        lab results, medical reports, OTPs, passwords, or financial
-        information.
-        """
-        if not consent_confirmed:
-            logger.info("Memory save rejected: consent not confirmed.")
-            return {
-                "success": False,
-                "message": (
-                    "Memory was not saved because caller consent "
-                    "was not confirmed."
-                ),
-            }
-
-        caller_id = self._get_caller_id(context)
-        if not caller_id:
-            return {
-                "success": False,
-                "message": "Caller identity is unavailable.",
-            }
-
-        if facts is None:
-            facts = {}
-
-        logger.info("Saving memory for caller: %s", caller_id)
-        result = save_caller(
-            caller_id=caller_id,
-            name=name,
-            language_preference=language_preference,
-            facts=facts,
-        )
-        logger.info("Memory saved successfully: %s", caller_id)
-
-        return {
-            "success": True,
-            "message": "Caller memory saved successfully.",
-            "memory": result,
-        }
-
-    # -----------------------------------------------------
-    # FORGET MEMORY
-    # -----------------------------------------------------
-    @function_tool()
-    async def forget_my_memory(self, context: RunContext) -> dict:
-        """
-        Delete all saved memory for the current caller.
-
-        Use only when the caller explicitly asks to forget or delete
-        their saved information.
-        """
-        caller_id = self._get_caller_id(context)
-        if not caller_id:
-            return {
-                "success": False,
-                "message": "Caller identity is unavailable.",
-            }
-
-        logger.info("Deleting memory for caller: %s", caller_id)
-        result = forget_caller(caller_id)
-        logger.info("Memory deletion result: %s", result.get("success"))
-        return result
-
+    # To add tools, use the @function_tool decorator.
     # Here's an example that adds a simple weather tool.
+    # You also have to add `from livekit.agents import function_tool, RunContext` to the top of this file
     # @function_tool
     # async def lookup_weather(self, context: RunContext, location: str):
     #     """Use this tool to look up current weather information in the given location.
@@ -513,31 +344,59 @@ server.setup_fnc = prewarm
 
 @server.rtc_session(agent_name="my-agent")
 async def my_agent(ctx: JobContext):
+    # Logging setup
+    # Add any other context you want in all log entries here
     ctx.log_context_fields = {
         "room": ctx.room.name,
     }
 
-    # Temporary Day 4 test identity, used only as a fallback if no
-    # real participant identity is found after connecting.
-    fallback_user_id = "day4_test_user"
-
+    # Set up a voice AI pipeline using Murf Falcon, Gemini, Deepgram, and the LiveKit turn detector
     session = AgentSession(
+        # Speech-to-text (STT) is your agent's ears, turning the user's speech into text that the LLM can understand
+        # See all available models at https://docs.livekit.io/agents/models/stt/
         stt=deepgram.STT(model="nova-3", language="multi"),
+        # A Large Language Model (LLM) is your agent's brain, processing user input and generating a response
+        # See all available models at https://docs.livekit.io/agents/models/llm/
         llm=google.LLM(
-            model="gemini-3.5-flash-lite",
-        ),
+                model="gemini-3.5-flash-lite",
+            ),
+        # Text-to-speech (TTS) is your agent's voice, turning the LLM's text into speech that the user can hear
+        # See all available models as well as voice selections at https://docs.livekit.io/agents/models/tts/
         tts=murf.TTS(
-            voice="Anisha",
-            locale="en-IN",
-            style="Conversation",
-            tokenizer=tokenize.basic.SentenceTokenizer(min_sentence_len=2),
-            text_pacing=True,
-        ),
+                voice="Anisha", 
+                locale="en-IN",
+                style="Conversation",
+                tokenizer=tokenize.basic.SentenceTokenizer(min_sentence_len=2),
+                text_pacing=True
+            ),
+        # VAD and turn detection are used to determine when the user is speaking and when the agent should respond
+        # See more at https://docs.livekit.io/agents/build/turns
         turn_detection=MultilingualModel(),
         vad=ctx.proc.userdata["vad"],
+        # allow the LLM to generate a response while waiting for the end of turn
+        # See more at https://docs.livekit.io/agents/build/audio/#preemptive-generation
         preemptive_generation=True,
-        user_away_timeout=8.0,
+        # Silence handling
+        user_away_timeout=8.0,   # seconds of silence before re-prompt
     )
+
+    # To use a realtime model instead of a voice pipeline, use the following session setup instead.
+    # (Note: This is for the OpenAI Realtime API. For other providers, see https://docs.livekit.io/agents/models/realtime/))
+    # 1. Install livekit-agents[openai]
+    # 2. Set OPENAI_API_KEY in .env.local
+    # 3. Add `from livekit.plugins import openai` to the top of this file
+    # 4. Use the following session setup instead of the version above
+    # session = AgentSession(
+    #     llm=openai.realtime.RealtimeModel(voice="marin")
+    # )
+
+    # # Add a virtual avatar to the session, if desired
+    # # For other providers, see https://docs.livekit.io/agents/models/avatar/
+    # avatar = hedra.AvatarSession(
+    #   avatar_id="...",  # See https://docs.livekit.io/agents/models/avatar/plugins/hedra
+    # )
+    # # Start the avatar and wait for it to join
+    # await avatar.start(session, room=ctx.room)
 
     silence_count = {"n": 0}
 
@@ -546,27 +405,16 @@ async def my_agent(ctx: JobContext):
         if ev.new_state == "away":
             silence_count["n"] += 1
             if silence_count["n"] >= 2:
-                session.say(
-                    "Lagta hai line theek nahi hai, main baad mein try karungi. Dhanyawaad!"
-                )
+                session.say("Lagta hai line theek nahi hai, main baad mein try karungi. Dhanyawaad!")
+                # optionally: end the session / disconnect here
             else:
                 session.say("Aap wahi hain? Main sun rahi hoon.")
         elif ev.new_state == "listening":
-            silence_count["n"] = 0
+            silence_count["n"] = 0  # reset once user speaks again
 
-    # Join the room and connect first, so we can read the real
-    # participant identity before starting the session.
-    await ctx.connect()
-
-    participant = next(iter(ctx.room.remote_participants.values()), None)
-    caller_id = participant.identity if participant else fallback_user_id
-
-    # Store the resolved caller identity where the Assistant's tools
-    # can read it back via context.session.userdata.
-    session.userdata = {"caller_id": caller_id}
-
+    # Start the session, which initializes the voice pipeline and warms up the models
     await session.start(
-        agent=Assistant(user_id=fallback_user_id),
+        agent=Assistant(),
         room=ctx.room,
         room_options=room_io.RoomOptions(
             audio_input=room_io.AudioInputOptions(
@@ -579,6 +427,9 @@ async def my_agent(ctx: JobContext):
             ),
         ),
     )
+
+    # Join the room and connect to the user
+    await ctx.connect()
 
 
 if __name__ == "__main__":
