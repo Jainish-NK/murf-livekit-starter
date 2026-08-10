@@ -22,6 +22,10 @@ from memory.memory_service import (
     save_caller,
     forget_caller,
 )
+from src.tools.healthcare_tools import (
+    check_triage_level,
+    find_nearby_healthcare_facility,
+)
 
 logger = logging.getLogger("agent")
 
@@ -352,13 +356,54 @@ unless the corresponding tool confirms success.
 
 When memory is unavailable, continue the conversation normally.
 Never invent a memory result.
+
+DAY 5 — TOOLS
+
+You have access to two healthcare tools.
+
+1. check_triage_level
+Use this when the caller describes symptoms that may indicate
+an emergency or asks what they should do about concerning symptoms.
+
+This tool is for safety triage only.
+It does not diagnose diseases.
+Never recommend medicine or dosage.
+
+If the tool returns "emergency":
+Immediately tell the caller that this may be an emergency.
+Tell them to call 108 or go to the nearest hospital immediately.
+Do not continue normal appointment booking.
+
+2. find_nearby_healthcare_facility
+Use this when the caller asks for a nearby PHC, hospital,
+clinic, health centre, or healthcare facility.
+
+Never invent facility names, addresses, phone numbers,
+distances, availability, or operating status.
+
+Only report information returned by the tool.
+
+If the tool fails, tell the caller that the healthcare
+information is temporarily unavailable.
+Never invent a result.
+
+Always mention the data update date when it is available.
+
+Never read JSON, field names, or technical tool output aloud.
+Convert tool results into a short, natural spoken response.
 """
 
 
 class Assistant(Agent):
 
     def __init__(self, user_id: str | None = None) -> None:
-        super().__init__(instructions=SYSTEM_PROMPT)
+        super().__init__(
+            instructions=SYSTEM_PROMPT,
+            tools=[
+                check_triage_level,
+                find_nearby_healthcare_facility,
+            ],
+        )
         # Fallback identity used only when a real room participant
         # identity isn't available yet (e.g. local/dev testing).
         self._fallback_user_id = user_id
@@ -528,7 +573,6 @@ async def my_agent(ctx: JobContext):
         ),
         tts=murf.TTS(
             voice="Anisha",
-            locale="en-IN",
             style="Conversation",
             tokenizer=tokenize.basic.SentenceTokenizer(min_sentence_len=2),
             text_pacing=True,

@@ -260,6 +260,99 @@ For deeper documentation on each part, see:
 
 ---
 
+
+## Day 5 – Healthcare Tools
+
+For Day 5, SehatSaathi was enhanced with healthcare-specific
+function tools that allow the voice agent to fetch domain data
+and perform basic safety triage.
+
+### Healthcare Facility Lookup
+
+SehatSaathi can search for healthcare facilities based on
+a city, district, or locality.
+
+The agent uses:
+
+- `find_nearby_healthcare_facility`
+- `check_triage_level`
+
+### Data Source
+
+The healthcare facility lookup currently uses a **local CSV
+dataset** containing 100 healthcare facility records.
+
+The data is stored locally in:
+
+`backend/data/healthcare_facilities.csv`
+
+This is **not a live government API or external real-time
+data source**.
+
+Each facility record contains an update date, allowing the
+agent to communicate when the available information was last
+updated.
+
+### Safety and Failure Handling
+
+The agent does not invent healthcare facility information.
+
+If:
+
+- the requested facility is not found, or
+- the healthcare data source is unavailable,
+
+the agent provides a graceful response instead of generating
+an unverified facility, address, phone number, or availability.
+
+### Triage Tool
+
+The `check_triage_level` tool performs a basic safety
+triage classification based on predefined emergency
+red-flag symptoms.
+
+It is not a diagnostic tool and does not recommend
+medications or dosages.
+
+For detected emergency symptoms, the agent advises the
+caller to call 108 or go to the nearest hospital.
+
+### Day 5 Tools
+
+1. `find_nearby_healthcare_facility`
+   - Searches the local healthcare facility dataset.
+   - Returns available facility information.
+   - Reports the dataset update date.
+
+2. `check_triage_level`
+   - Checks for predefined emergency red flags.
+   - Returns an emergency or routine triage level.
+   - Provides a safe next-step response.
+
+### Day 5 Advanced Flow
+
+SehatSaathi can chain healthcare tools during a conversation.
+
+For example:
+
+User describes severe chest pain
+→ `check_triage_level`
+→ Emergency detected
+→ User asks for a nearby hospital
+→ `find_nearby_healthcare_facility`
+→ Healthcare facility information is returned.
+
+### Day 5 Status
+
+- [x] Healthcare facility lookup
+- [x] Local healthcare dataset
+- [x] Tool-based function calling
+- [x] Failure handling
+- [x] Data freshness information
+- [x] Emergency triage
+- [x] Natural voice responses
+- [x] Tool chaining
+
 ## Links
 
 - [Murf API Docs](https://murf.ai/api/docs)
