@@ -353,6 +353,114 @@ User describes severe chest pain
 - [x] Natural voice responses
 - [x] Tool chaining
 
+---
+
+## Day 7 – Know When to Ask for Human Help (Human Escalation via Email)
+
+In Day 7 of the **10 Days of AI Voice Agents** challenge (**Health Access Track**), SehatSaathi is taught to recognize clinical boundaries, refuse diagnostic claims, and escalate high-risk or diagnostic scenarios to human healthcare professionals via **SMTP Email** with strict, explicit user consent and privacy sanitization.
+
+```mermaid
+flowchart TD
+    A[Caller Speaks] --> B{Does this require human help?}
+    B -->|No - Routine Inquiry| C[Normal Clinic Response]
+    B -->|Yes - Red Flag or Diagnosis| D[Explain Need for Human Help]
+    D --> E[Inform Caller What Data Will Be Shared]
+    E --> F[Ask for Explicit Consent]
+    F --> G{Caller Response}
+    G -->|Yes / Clear Confirmation| H[create_escalation tool]
+    H --> I[Sanitize Secrets & OTPs]
+    I --> J[Generate Sequential Ref ID ESC-2026-001]
+    J --> K[Persist in SQLite]
+    K --> L[Dispatch Email via SMTP]
+    L --> M[Return Ref ID & Next Steps to Caller]
+    G -->|No / Permission Denied| N[Do NOT call tool / reassure caller nothing was shared]
+    G -->|Ambiguous: Maybe, Hmm| O[Do NOT call tool / Re-ask permission]
+```
+
+### 1. Two Escalation Triggers
+
+1. **Trigger 1 — Red-Flag Emergency Symptoms**
+   - *Examples*: Severe chest pain, breathing difficulty, sudden numbness/stroke symptoms, heavy bleeding, loss of consciousness.
+   - *Flow*: Automatically runs `check_triage_level` -> Delivers immediate emergency advice (Call 108 / Visit Emergency Room) -> Offers human support escalation as an additional workflow.
+2. **Trigger 2 — Diagnosis Requests**
+   - *Examples*: *"Can you diagnose me?"*, *"Mujhe batao mujhe kaunsi bimari hai"*, *"What disease do I have?"*
+   - *Flow*: Explicitly refuses to diagnose as an AI -> Explains human medical expertise is required -> Offers to create a human support request.
+
+### 2. Mandatory Permission & Consent Flow
+
+The agent **never** creates an escalation or shares data without explicit user permission.
+- **Pre-Escalation Disclosure**: Explains what will be shared (summary, urgency, language, preferred follow-up method) and what will **never** be shared (OTPs, passwords, PINs, bank details).
+- **Clear Affirmation**: Only `"Yes"`, `"Yes, please"`, `"Go ahead"`, `"हाँ, बना दीजिए"` triggers `create_escalation()`.
+- **Ambiguous Replies**: Words like `"Maybe"`, `"Hmm"`, `"Okay"` do NOT trigger the tool; the agent asks for clarification.
+- **Denial**: Replying `"No"` immediately prevents data sharing, and the agent explicitly confirms nothing was sent.
+
+### 3. Tool: `create_escalation`
+
+- **Parameters**: `reason`, `summary`, `what_agent_checked`, `urgency` (`EMERGENCY` | `HIGH` | `MEDIUM` | `LOW`), `language`, `preferred_followup`.
+- **Reference ID**: Auto-generates clean, collision-free sequential IDs formatted as `ESC-2026-001`, `ESC-2026-002`, etc.
+- **Persistence**: SQLite database table `escalations` (`backend/data/memory.db`).
+- **Privacy Sanitization**: Redacts 4–8 digit OTPs, PINs, passwords, card numbers, and API tokens prior to storage or email dispatch.
+
+### 4. Email Notification Format
+
+Notifications are dispatched directly to the human support inbox using standard SMTP:
+
+**Subject**: `[SehatSaathi] Human Escalation — ESC-2026-001 — EMERGENCY`
+
+**Body**:
+```text
+SEHATSAATHI HUMAN ESCALATION REQUEST
+
+Reference ID:
+ESC-2026-001
+
+Reason:
+Red-Flag Symptom
+
+Urgency:
+EMERGENCY
+
+Summary:
+Caller reported severe chest pain and difficulty breathing.
+
+What the Agent Checked:
+Existing triage identified the symptoms as potentially urgent.
+
+Language:
+Hindi
+
+Preferred Follow-up:
+Phone
+
+Status:
+OPEN
+
+Created At:
+12 August 2026, 18:30 UTC
+```
+
+### 5. Environment Setup for Email (SMTP)
+
+Add your SMTP configuration to `backend/.env.local`:
+```env
+ESCALATION_EMAIL_TO=human-support@example.com
+ESCALATION_EMAIL_FROM=voice-agent@example.com
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_USERNAME=your_email@gmail.com
+SMTP_PASSWORD=your_app_password
+```
+
+### 6. Running Tests
+
+Run the Day 7 test suite:
+```bash
+cd backend
+uv run pytest tests/test_escalation.py -v
+```
+
+---
+
 ## Links
 
 - [Murf API Docs](https://murf.ai/api/docs)
@@ -369,3 +477,4 @@ User describes severe chest pain
 ## License
 
 MIT
+

@@ -1,6 +1,6 @@
 'use client';
 
-import { X, Mic, Calendar, Clock, MessageSquare, ShieldCheck, HeartPulse } from 'lucide-react';
+import { X, Mic, Calendar, Clock, MessageSquare, ShieldCheck, HeartPulse, AlertTriangle } from 'lucide-react';
 import type { TranslationDictionary } from '@/lib/translations';
 
 interface HelpModalProps {
@@ -33,7 +33,7 @@ export function HelpModal({ isOpen, onClose, t }: HelpModalProps) {
               <h3 id="help-modal-title" className="font-display text-base font-bold text-foreground">
                 How to use SehatSaathi AI
               </h3>
-              <p className="text-xs text-muted-foreground">Virtual Receptionist Quick Guide</p>
+              <p className="text-xs text-muted-foreground">Virtual Receptionist & Health Access Guide</p>
             </div>
           </div>
           <button
@@ -47,7 +47,7 @@ export function HelpModal({ isOpen, onClose, t }: HelpModalProps) {
         </div>
 
         {/* Content */}
-        <div className="space-y-3 text-xs text-foreground/90">
+        <div className="space-y-3 text-xs text-foreground/90 max-h-[60vh] overflow-y-auto pr-1">
           <div className="flex items-start gap-3 rounded-2xl bg-surface-mint/60 dark:bg-card p-3 border border-green/20">
             <Mic className="size-4 text-green dark:text-green-light shrink-0 mt-0.5" />
             <div>
@@ -71,9 +71,9 @@ export function HelpModal({ isOpen, onClose, t }: HelpModalProps) {
           <div className="flex items-start gap-3 rounded-2xl bg-muted/40 p-3 border border-border">
             <Clock className="size-4 text-green dark:text-green-light shrink-0 mt-0.5" />
             <div>
-              <p className="font-bold text-foreground">3. Clinic Information</p>
+              <p className="font-bold text-foreground">3. Clinic Information & Facility Lookup</p>
               <p className="text-muted-foreground mt-0.5">
-                Ask about timings (Mon–Sat 9 AM – 7 PM), doctors, or available departments (General Medicine, Pediatrics, Gynecology).
+                Ask about timings (Mon–Sat 9 AM – 7 PM), doctors, or nearby PHCs/hospitals across your locality or district.
               </p>
             </div>
           </div>
@@ -84,6 +84,16 @@ export function HelpModal({ isOpen, onClose, t }: HelpModalProps) {
               <p className="font-bold text-foreground">4. Messages for Doctors</p>
               <p className="text-muted-foreground mt-0.5">
                 Leave callback messages or non-urgent queries for the doctor and front-desk team.
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-start gap-3 rounded-2xl bg-destructive/10 p-3 border border-destructive/20">
+            <AlertTriangle className="size-4 text-destructive shrink-0 mt-0.5" />
+            <div>
+              <p className="font-bold text-foreground">5. Human Healthcare Escalation (Day 7)</p>
+              <p className="text-muted-foreground mt-0.5">
+                If emergency symptoms (e.g. chest pain) or diagnosis requests are detected, SehatSaathi asks for your explicit permission to create a structured human escalation with a unique Reference ID (e.g. ESC-2026-001) dispatched to the clinic support team via email.
               </p>
             </div>
           </div>
