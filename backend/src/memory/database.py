@@ -57,7 +57,7 @@ def get_connection() -> sqlite3.Connection:
 
 def init_database() -> None:
     """
-    Create the caller_memory table if it does not exist.
+    Create the caller_memory and call_analytics tables if they do not exist.
     """
 
     with get_connection() as connection:
@@ -70,6 +70,25 @@ def init_database() -> None:
                 language_preference TEXT,
                 facts TEXT,
                 last_interaction TEXT
+            )
+            """
+        )
+
+        connection.execute(
+            """
+            CREATE TABLE IF NOT EXISTS call_analytics (
+                call_id TEXT PRIMARY KEY,
+                caller_id TEXT,
+                call_mode TEXT,
+                language TEXT,
+                start_time TEXT,
+                end_time TEXT,
+                duration INTEGER,
+                status TEXT,
+                outcome TEXT,
+                failure_reason TEXT,
+                success_reason TEXT,
+                created_at TEXT
             )
             """
         )

@@ -389,6 +389,110 @@ async def my_agent(ctx: JobContext):
         elif ev.new_state == "listening":
             silence_count["n"] = 0
 
+    @session.on("user_input_transcribed")
+    def on_user_input_transcribed(ev):
+        if ev.language:
+            lang_str = str(ev.language).lower()
+            if lang_str.startswith("hi"):
+                session.userdata["language"] = "Hindi"
+                return
+            elif lang_str.startswith("en"):
+                session.userdata["language"] = "English"
+                return
+            elif lang_str.startswith("gu"):
+                session.userdata["language"] = "Gujarati"
+                return
+
+        if ev.transcript:
+            import re
+            if re.search(r"[\u0900-\u097F]", ev.transcript):
+                session.userdata["language"] = "Hindi"
+            else:
+                session.userdata["language"] = "English"
+
+    @session.on("function_tools_executed")
+    def on_function_tools_executed(ev):
+        for call, output in ev.zipped():
+            tool_name = call.name
+            
+            # Verify tool execution output status
+            is_success = False
+            if output is not None and not output.is_error:
+                try:
+                    res_data = json.loads(output.output)
+                    if isinstance(res_data, dict):
+                        if res_data.get("success") is False:
+                            is_success = False
+                        else:
+                            is_success = True
+                    else:
+                        is_success = True
+                except Exception:
+                    is_success = True
+            
+            if is_success:
+                if tool_name == "create_escalation":
+                    session.userdata["success"] = True
+                    session.userdata["success_reason"] = "HUMAN_ESCALATION"
+                    session.userdata["details"] = "Escalated to human support"
+                elif tool_name == "find_nearby_healthcare_facility":
+                    session.userdata["success"] = True
+                    session.userdata["success_reason"] = "SAFE_GUIDANCE"
+                    session.userdata["details"] = "Looked up nearby healthcare facility"
+                elif tool_name == "record_medication_intake":
+                    session.userdata["success"] = True
+                    session.userdata["success_reason"] = "CLINIC_INFORMATION"
+                    session.userdata["details"] = "Recorded medication adherence status"
+                elif tool_name == "schedule_followup_reminder":
+                    session.userdata["success"] = True
+                    session.userdata["success_reason"] = "CLINIC_INFORMATION"
+                    session.userdata["details"] = "Scheduled follow-up reminder callback"
+                elif tool_name == "opt_out_patient":
+                    session.userdata["success"] = True
+                    session.userdata["success_reason"] = "CLINIC_INFORMATION"
+                    session.userdata["details"] = "Patient opted out of future calls"
+                elif tool_name == "save_caller_memory":
+                    session.userdata["success"] = True
+                    session.userdata["success_reason"] = "CLINIC_INFORMATION"
+                    session.userdata["details"] = "Saved caller preferences to memory"
+            else:
+                session.userdata["success"] = False
+                session.userdata["failure_reason"] = "TOOL_FAILURE"
+                session.userdata["details"] = f"Tool {tool_name} execution failed"
+
+    @session.on("close")
+    def on_close(ev):
+        try:
+            from analytics_service import log_call_end, classify_call_outcome
+        except ImportError:
+            from src.analytics_service import log_call_end, classify_call_outcome
+
+        language = session.userdata.get("language", "Unknown")
+        messages = session._chat_ctx.messages()
+        user_messages = [m for m in messages if m.role == "user"]
+        assistant_messages = [m for m in messages if m.role == "assistant"]
+
+        user_strings = [m.text_content for m in user_messages if m.text_content]
+        assistant_strings = [m.text_content for m in assistant_messages if m.text_content]
+
+        outcome, success_reason, failure_reason, details = classify_call_outcome(
+            session_success=bool(session.userdata.get("success")),
+            success_reason=session.userdata.get("success_reason"),
+            failure_reason=session.userdata.get("failure_reason"),
+            details=session.userdata.get("details", "Call ended prematurely"),
+            user_messages=user_strings,
+            assistant_messages=assistant_strings,
+            ev_error=str(ev.error) if ev.error else None
+        )
+
+        log_call_end(
+            call_id=ctx.room.name,
+            outcome=outcome,
+            failure_reason=failure_reason,
+            success_reason=success_reason,
+            language=language
+        )
+
     # Join the room and connect
     await ctx.connect()
 
@@ -406,6 +510,16 @@ async def my_agent(ctx: JobContext):
     participant = next(iter(ctx.room.remote_participants.values()), None)
     caller_id = participant.identity if participant else fallback_user_id
 
+    # Determine call mode
+    call_mode = outbound_meta.get("call_mode", "inbound")
+    if call_mode == "inbound":
+        if ctx.room.name.startswith("voice_assistant_room"):
+            call_mode = "browser"
+        elif participant and (participant.identity.startswith("phone_") or participant.identity.startswith("sip_")):
+            pass
+        else:
+            call_mode = "browser"
+
     # Populate session userdata for tools and context without breaking Day 1-6
     session.userdata = {
         "caller_id": caller_id,
@@ -414,8 +528,23 @@ async def my_agent(ctx: JobContext):
         "call_type": outbound_meta.get("call_type", "inbound"),
         "call_id": outbound_meta.get("call_id"),
         "details": outbound_meta.get("details", ""),
-        "call_mode": outbound_meta.get("call_mode", "inbound"),
+        "call_mode": call_mode,
+        "success": False,
+        "success_reason": None,
+        "failure_reason": "INCOMPLETE_TASK",
+        "language": "Unknown",
     }
+
+    try:
+        from analytics_service import log_call_start
+    except ImportError:
+        from src.analytics_service import log_call_start
+
+    log_call_start(
+        call_id=ctx.room.name,
+        caller_id=caller_id,
+        call_mode=call_mode
+    )
 
     # Start the assistant session
     await session.start(

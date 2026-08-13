@@ -1,7 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { Globe, HelpCircle, ChevronDown } from 'lucide-react';
+import { Globe, HelpCircle, ChevronDown, BarChart3 } from 'lucide-react';
+import Link from 'next/link';
 import { ThemeToggle } from '@/components/app/theme-toggle';
 import { HelpModal } from '@/components/sehatsaathi/help-modal';
 import {
@@ -93,6 +94,16 @@ export function BrandHeader({
               <ChevronDown className="size-3 text-muted-foreground shrink-0 pointer-events-none" />
             </div>
           </div>
+
+          {/* Dashboard Pill Button */}
+          <Link
+            href="/dashboard"
+            className="inline-flex items-center gap-1.5 rounded-full border border-border bg-surface dark:bg-card px-2.5 sm:px-3 py-1 sm:py-1.5 text-xs font-semibold text-foreground shadow-2xs hover:bg-muted/60 transition-all focus-visible:ring-2 focus-visible:ring-green cursor-pointer"
+            aria-label="Analytics Dashboard"
+          >
+            <BarChart3 className="size-3.5 text-green dark:text-green-light shrink-0" />
+            <span className="hidden sm:inline text-slate-700 dark:text-slate-300">Dashboard</span>
+          </Link>
 
           {/* 2. Help Pill Button */}
           <button

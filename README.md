@@ -459,6 +459,45 @@ cd backend
 uv run pytest tests/test_escalation.py -v
 ```
 
+## Day 8 – Call Analytics Dashboard
+
+Day 8 enhances SehatSaathi with a real-time Call Analytics Dashboard. It provides a visual interface for metrics and logs that are stored and updated in the existing SQLite database.
+
+### 1. Success & Failure Definition
+* **Success**: A call is classified as successful if it reaches a useful health-service outcome. This is signaled by the successful execution of core action tools (`create_escalation`, `find_nearby_healthcare_facility`, `record_medication_intake`, `schedule_followup_reminder`, `opt_out_patient`, `save_caller_memory`) or when keyword and pattern analysis confirms a successful clinical query or safe health guidance was provided.
+* **Failure**: A call is classified as failed if it ends before reaching a success condition (e.g. user hangs up early, silence timeout / no response, incomplete tasks, or operational errors).
+
+### 2. Database Integration
+The existing SQLite database is modified with a new table `call_analytics` containing:
+- `call_id` (Unique LiveKit room name)
+- `caller_id` (Masked identifier for privacy)
+- `call_mode` (browser, inbound, outbound)
+- `language` (Hindi, English, Gujarati, Unknown)
+- `start_time`, `end_time` (ISO timestamps)
+- `duration` (Calculated duration in seconds)
+- `status` (initiated, in_progress, completed)
+- `outcome` (success, failed)
+- `success_reason` (SAFE_GUIDANCE, HUMAN_ESCALATION, CLINIC_INFORMATION)
+- `failure_reason` (USER_HANGUP, INCOMPLETE_TASK, TOOL_FAILURE, API_ERROR, NO_RESPONSE, SILENCE_TIMEOUT)
+
+### 3. Caller Privacy
+Strict caller identity masking is implemented inside `mask_caller_id()` to comply with HIPAA/GDPR rules:
+- Browser-based users are logged and displayed as `Browser User`.
+- Telephone and SIP caller numbers are masked: e.g. `+919876543210` -> `+91******3210`.
+- No medical logs, API keys, SMTP passwords, or transcripts are stored in analytics.
+
+### 4. Running the Dashboard
+1. The backend runs standard livekit workers.
+2. The Next.js frontend fetches database metrics dynamically from the `/api/analytics` endpoint.
+3. Open `http://localhost:3000/dashboard` in your browser to view the real-time metrics, auto-refresh toggles, failure breakdowns, and recent call histories.
+
+### 5. Running Tests
+Run the entire test suite, including the call analytics tests:
+```bash
+cd backend
+uv run pytest tests/
+```
+
 ---
 
 ## Links
