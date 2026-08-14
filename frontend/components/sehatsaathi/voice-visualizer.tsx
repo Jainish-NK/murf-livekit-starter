@@ -1,8 +1,8 @@
 'use client';
 
 import { useMemo } from 'react';
-import type { UIState } from '@/hooks/use-ui-state';
 import { usePrefersReducedMotion } from '@/hooks/use-prefers-reduced-motion';
+import type { UIState } from '@/hooks/use-ui-state';
 import { cn } from '@/lib/shadcn/utils';
 
 interface VoiceVisualizerProps {
@@ -35,7 +35,10 @@ export function VoiceVisualizer({
 
   return (
     <div
-      className={cn('flex items-center justify-center gap-1.5 h-10 px-4 py-1 select-none', className)}
+      className={cn(
+        'flex h-10 items-center justify-center gap-1.5 px-4 py-1 select-none',
+        className
+      )}
       role="presentation"
       aria-hidden="true"
     >

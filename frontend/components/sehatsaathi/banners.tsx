@@ -1,8 +1,8 @@
 'use client';
 
-import { AlertTriangle, MicOff, Lock, RefreshCw, CheckCircle2, HelpCircle } from 'lucide-react';
-import { cn } from '@/lib/shadcn/utils';
+import { AlertTriangle, CheckCircle2, HelpCircle, Lock, MicOff, RefreshCw } from 'lucide-react';
 import type { MicPermissionStatus } from '@/hooks/use-mic-permission';
+import { cn } from '@/lib/shadcn/utils';
 import type { TranslationDictionary } from '@/lib/translations';
 
 interface MicBannerProps {
@@ -36,34 +36,41 @@ export function MicBanner({ status, t, onRetry, className }: MicBannerProps) {
     <div
       role="alert"
       className={cn(
-        'mx-auto flex w-full max-w-lg flex-col gap-3.5 rounded-3xl border border-destructive/40 bg-destructive/10 dark:bg-destructive/15 p-5 text-left shadow-lg backdrop-blur-md transition-all duration-300 animate-in fade-in',
+        'border-destructive/40 bg-destructive/10 dark:bg-destructive/15 animate-in fade-in mx-auto flex w-full max-w-lg flex-col gap-3.5 rounded-3xl border p-5 text-left shadow-lg backdrop-blur-md transition-all duration-300',
         className
       )}
     >
       <div className="flex items-start gap-3.5">
-        <span className="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-destructive/20 text-destructive">
+        <span className="bg-destructive/20 text-destructive flex size-11 shrink-0 items-center justify-center rounded-2xl">
           <MicOff className="size-5" />
         </span>
         <div className="flex-1">
-          <h4 className="font-display text-base font-bold text-destructive leading-tight">
+          <h4 className="font-display text-destructive text-base leading-tight font-bold">
             {title}
           </h4>
-          <p className="mt-1 text-xs sm:text-sm leading-relaxed text-foreground/90">
-            {message}
-          </p>
+          <p className="text-foreground/90 mt-1 text-xs leading-relaxed sm:text-sm">{message}</p>
         </div>
       </div>
 
       {isDenied && (
-        <div className="flex flex-col gap-2 rounded-2xl bg-surface/90 dark:bg-card/90 p-4 border border-border/80 text-xs text-foreground/90">
-          <div className="flex items-center gap-2 font-bold text-foreground">
-            <Lock className="size-4 text-saffron shrink-0" />
+        <div className="bg-surface/90 dark:bg-card/90 border-border/80 text-foreground/90 flex flex-col gap-2 rounded-2xl border p-4 text-xs">
+          <div className="text-foreground flex items-center gap-2 font-bold">
+            <Lock className="text-saffron size-4 shrink-0" />
             <span>How to enable your microphone:</span>
           </div>
-          <ol className="list-decimal list-inside space-y-1 text-muted-foreground pl-1 text-[11px] sm:text-xs">
-            <li>Click the <span className="font-semibold text-foreground">🔒 lock icon</span> in your browser address bar.</li>
-            <li>Change the <span className="font-semibold text-foreground">Microphone</span> setting to <span className="font-semibold text-green dark:text-green-light">Allow</span>.</li>
-            <li>Click the <span className="font-semibold text-foreground">"Try Again"</span> button below.</li>
+          <ol className="text-muted-foreground list-inside list-decimal space-y-1 pl-1 text-[11px] sm:text-xs">
+            <li>
+              Click the <span className="text-foreground font-semibold">🔒 lock icon</span> in your
+              browser address bar.
+            </li>
+            <li>
+              Change the <span className="text-foreground font-semibold">Microphone</span> setting
+              to <span className="text-green dark:text-green-light font-semibold">Allow</span>.
+            </li>
+            <li>
+              Click the <span className="text-foreground font-semibold">&quot;Try Again&quot;</span>{' '}
+              button below.
+            </li>
           </ol>
         </div>
       )}
@@ -72,7 +79,7 @@ export function MicBanner({ status, t, onRetry, className }: MicBannerProps) {
         <button
           type="button"
           onClick={onRetry}
-          className="inline-flex min-h-10 w-full items-center justify-center gap-2 rounded-xl bg-destructive hover:bg-destructive/90 text-xs sm:text-sm font-bold text-destructive-foreground shadow-xs transition-all active:scale-[0.99] cursor-pointer"
+          className="bg-destructive hover:bg-destructive/90 text-destructive-foreground inline-flex min-h-10 w-full cursor-pointer items-center justify-center gap-2 rounded-xl text-xs font-bold shadow-xs transition-all active:scale-[0.99] sm:text-sm"
         >
           <RefreshCw className="size-3.5" />
           <span>Try Again</span>
@@ -136,15 +143,13 @@ export function ConnectionBanner({ variant, t, onRetry, className }: ConnectionB
         <div className="flex-1">
           <h4
             className={cn(
-              'font-display text-base font-bold leading-tight',
+              'font-display text-base leading-tight font-bold',
               isReconnecting ? 'text-amber-700 dark:text-amber-400' : 'text-destructive'
             )}
           >
             {title}
           </h4>
-          <p className="mt-1.5 text-xs leading-relaxed text-foreground/90 sm:text-sm">
-            {copy}
-          </p>
+          <p className="text-foreground/90 mt-1.5 text-xs leading-relaxed sm:text-sm">{copy}</p>
         </div>
       </div>
 
@@ -152,7 +157,7 @@ export function ConnectionBanner({ variant, t, onRetry, className }: ConnectionB
         <button
           type="button"
           onClick={onRetry}
-          className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl bg-green hover:bg-green/90 text-sm font-bold text-white shadow-xs transition-all focus-visible:ring-2 focus-visible:ring-green cursor-pointer"
+          className="bg-green hover:bg-green/90 focus-visible:ring-green inline-flex min-h-11 w-full cursor-pointer items-center justify-center gap-2 rounded-xl text-sm font-bold text-white shadow-xs transition-all focus-visible:ring-2"
         >
           <RefreshCw className="size-4" />
           {t.errors.retryBtn}

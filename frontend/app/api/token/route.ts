@@ -1,9 +1,5 @@
 import { NextResponse } from 'next/server';
-import {
-  AccessToken,
-  type AccessTokenOptions,
-  type VideoGrant,
-} from 'livekit-server-sdk';
+import { AccessToken, type AccessTokenOptions, type VideoGrant } from 'livekit-server-sdk';
 import { RoomConfiguration } from '@livekit/protocol';
 
 type ConnectionDetails = {
@@ -41,12 +37,9 @@ export async function POST(req: Request) {
     let roomConfig: RoomConfiguration | undefined;
 
     if (body?.room_config) {
-      roomConfig = RoomConfiguration.fromJson(
-        body.room_config,
-        {
-          ignoreUnknownFields: true,
-        }
-      );
+      roomConfig = RoomConfiguration.fromJson(body.room_config, {
+        ignoreUnknownFields: true,
+      });
     } else if (AGENT_NAME) {
       roomConfig = RoomConfiguration.fromJson(
         {
@@ -68,10 +61,7 @@ export async function POST(req: Request) {
 
     const callerId = body?.caller_id;
 
-    if (
-      typeof callerId !== 'string' ||
-      callerId.trim().length === 0
-    ) {
+    if (typeof callerId !== 'string' || callerId.trim().length === 0) {
       throw new Error('caller_id is required');
     }
 
@@ -84,8 +74,7 @@ export async function POST(req: Request) {
     const participantName = 'user';
 
     // Room can still be different for every call.
-    const roomName =
-      `voice_assistant_room_${crypto.randomUUID()}`;
+    const roomName = `voice_assistant_room_${crypto.randomUUID()}`;
 
     // Generate participant token
     const participantToken = await createParticipantToken(
@@ -116,20 +105,14 @@ export async function POST(req: Request) {
     if (error instanceof Error) {
       console.error(error);
 
-      return new NextResponse(
-        error.message,
-        {
-          status: 500,
-        }
-      );
+      return new NextResponse(error.message, {
+        status: 500,
+      });
     }
 
-    return new NextResponse(
-      'Unknown error',
-      {
-        status: 500,
-      }
-    );
+    return new NextResponse('Unknown error', {
+      status: 500,
+    });
   }
 }
 
@@ -138,14 +121,10 @@ function createParticipantToken(
   roomName: string,
   roomConfig?: RoomConfiguration
 ): Promise<string> {
-  const at = new AccessToken(
-    API_KEY!,
-    API_SECRET!,
-    {
-      ...userInfo,
-      ttl: '15m',
-    }
-  );
+  const at = new AccessToken(API_KEY!, API_SECRET!, {
+    ...userInfo,
+    ttl: '15m',
+  });
 
   const grant: VideoGrant = {
     room: roomName,

@@ -4,8 +4,8 @@ import path from 'path';
 
 export const revalidate = 0; // Ensure no Next.js API route caching
 
-export async function GET() {
-  return new Promise((resolve) => {
+export async function GET(): Promise<Response> {
+  return new Promise<Response>((resolve) => {
     // Resolve absolute path to the dump script
     const scriptPath = path.resolve(process.cwd(), '../backend/src/dump_analytics.py');
     const backendDir = path.resolve(process.cwd(), '../backend');
@@ -39,8 +39,9 @@ export async function GET() {
       try {
         const data = JSON.parse(stdout);
         return resolve(NextResponse.json(data));
-      } catch (parseError: any) {
-        console.error(`JSON Parse Error: ${parseError?.message || parseError}`);
+      } catch (parseError: unknown) {
+        const parseErrorMsg = parseError instanceof Error ? parseError.message : String(parseError);
+        console.error(`JSON Parse Error: ${parseErrorMsg}`);
         console.error(`Raw output was: ${stdout}`);
         return resolve(
           NextResponse.json(

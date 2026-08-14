@@ -61,7 +61,7 @@ export function App({ appConfig }: AppProps) {
       return await response.json();
     });
   }, [appConfig]);
-  
+
   const session = useSession(
     tokenSource,
     appConfig.agentName ? { agentName: appConfig.agentName } : undefined

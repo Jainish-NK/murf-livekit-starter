@@ -1,4 +1,4 @@
-export type SupportedLanguage = 'en' | 'hi' | 'hinglish' | 'gu';
+export type SupportedLanguage = 'en' | 'hi' | 'gu';
 
 export interface LanguageOption {
   code: SupportedLanguage;
@@ -8,7 +8,6 @@ export interface LanguageOption {
 }
 
 export const SUPPORTED_LANGUAGES: LanguageOption[] = [
-  { code: 'hinglish', name: 'Hinglish', nativeName: 'Hinglish (Hindi+English)', flag: '🇮🇳' },
   { code: 'hi', name: 'Hindi', nativeName: 'हिन्दी', flag: '🇮🇳' },
   { code: 'en', name: 'English', nativeName: 'English', flag: '🌐' },
   { code: 'gu', name: 'Gujarati', nativeName: 'ગુજરાતી', flag: '🇮🇳' },
@@ -145,140 +144,12 @@ export interface TranslationDictionary {
 }
 
 export const TRANSLATIONS: Record<SupportedLanguage, TranslationDictionary> = {
-  hinglish: {
-    badge: 'VOICE FOR BHARAT',
-    roleBadge: 'AI Clinic Receptionist',
-    heroHeading: 'Your Clinic. Your Voice. Your Saathi.',
-    heroSubheading: 'Talk naturally with SehatSaathi AI to get clinic information, request an appointment, or leave a message for the clinic team.',
-    states: {
-      ready: {
-        title: 'Ready to talk',
-        message: 'SehatSaathi AI is ready when you are. Baat shuru karein!',
-        cta: 'Start Conversation • Baat Shuru Karein',
-      },
-      connecting: {
-        title: 'Connecting to SehatSaathi AI...',
-        message: 'Please wait while we connect your voice session.',
-        cta: 'Connecting...',
-      },
-      listening: {
-        title: 'Listening to you',
-        message: "Go ahead, I'm listening. Aap boliye, main sun rahi hoon.",
-        speakerLabel: 'Listening to you',
-      },
-      speaking: {
-        title: 'SehatSaathi is speaking',
-        message: "I'm responding to you. Main jawab de rahi hoon.",
-        speakerLabel: 'SehatSaathi is speaking',
-      },
-      ended: {
-        title: 'Conversation ended',
-        message: 'Thank you for talking with SehatSaathi AI. Call safaltapurvak samapt hui.',
-        cta: 'Start Again • Dobara Baat Karein',
-        secondaryCta: 'View Clinic Details',
-      },
-      reconnecting: {
-        title: 'Connection interrupted',
-        message: "We're trying to reconnect your voice session. Kripya line par bane rahein...",
-      },
-    },
-    errors: {
-      micDeniedTitle: 'Microphone access is required',
-      micDeniedMessage: 'SehatSaathi AI needs microphone access to hear you. Please allow microphone permission in your browser settings and try again.',
-      micInstructions: 'Address bar mein 🔒 lock icon par click karke Microphone ko Allow karein, fir page refresh karein.',
-      connectionErrorTitle: "We couldn't connect",
-      connectionErrorMessage: 'Something went wrong while connecting to SehatSaathi AI. Please check your internet connection and try again.',
-      connectionTimeoutTitle: 'Connection timed out',
-      connectionTimeoutMessage: 'Connecting is taking longer than expected. Please check your network and try again.',
-      retryBtn: 'Try Again • Dobara Koshish Karein',
-    },
-    controls: {
-      endCall: 'End Conversation',
-      sessionDuration: 'Conversation',
-      privacyNote: 'Microphone access is used solely for your real-time voice conversation.',
-      speakingLive: 'Live audio reactive',
-    },
-    transcript: {
-      title: 'Live Conversation',
-      subtitle: 'Real-time conversation transcript',
-      emptyText: 'Start speaking — transcript will appear here.',
-      emptySubtext: 'Aap Hindi, English, ya Hinglish mein baat kar sakte hain.',
-      copyTooltip: 'Copy transcript to clipboard',
-      copiedTooltip: 'Copied to clipboard!',
-      downloadTooltip: 'Download transcript (.txt)',
-      clearTooltip: 'Clear transcript view',
-      youLabel: 'You (Caller)',
-      assistantLabel: 'SehatSaathi AI (Receptionist)',
-      messagesCount: (n: number) => `Live Conversation · ${n} ${n === 1 ? 'message' : 'messages'}`,
-      toggleShow: 'Show Live Transcript',
-      toggleHide: 'Hide Live Transcript',
-    },
-    quickActions: {
-      heading: 'Quick Voice Actions',
-      subheading: 'Try saying any of these to start your conversation:',
-      appointment: {
-        title: 'Book an Appointment',
-        desc: 'Request or reschedule a clinic appointment slot.',
-        samplePrompt: '“Mujhe kal subah general checkup ke liye appointment chahiye.”',
-      },
-      clinicInfo: {
-        title: 'Clinic Information',
-        desc: 'Check clinic timings, location, or departments.',
-        samplePrompt: '“Clinic ke opening timings aur available services kya hain?”',
-      },
-      doctorMessage: {
-        title: 'Leave a Message',
-        desc: 'Leave a message for the clinic doctor team.',
-        samplePrompt: '“Doctor ke liye ek callback message note kar lijiye.”',
-      },
-    },
-    clinicCard: {
-      title: 'Sunrise Family Clinic',
-      name: 'Sunrise Family Clinic',
-      hoursLabel: 'Clinic Timings',
-      hoursValue: 'Monday – Saturday · 9:00 AM – 7:00 PM (Sunday Closed)',
-      servicesLabel: 'Available Departments',
-      servicesList: ['General Medicine', 'Pediatrics (Child Health)', 'Gynecology (Women Health)'],
-      disclaimer: 'Note: Appointment requests and messages are recorded by SehatSaathi AI and confirmed directly by Sunrise Family Clinic staff.',
-    },
-    requestGuide: {
-      title: 'How Appointment Requests Work',
-      step1: '1. Name',
-      step2: '2. Reason for Visit',
-      step3: '3. Preferred Date',
-      step4: '4. Preferred Time',
-      step5: '5. Doctor / Department',
-      note: 'SehatSaathi notes your request details cleanly. Final slot confirmation is verified by the clinic.',
-    },
-    trust: {
-      title: 'Designed for Bharat',
-      item1Title: 'Voice-First Access',
-      item1Desc: 'Zero complicated menus or forms — just speak naturally as you would to a receptionist.',
-      item2Title: 'Multilingual & Hinglish',
-      item2Desc: 'Naturally understands Hindi, English, and code-mixed conversational Hinglish.',
-      item3Title: 'Accurate Clinic Coordination',
-      item3Desc: 'Records exact requests, preferences, and messages for verified clinic follow-up.',
-      item4Title: 'Strict Medical Safety',
-      item4Desc: 'Never gives unverified medical advice or fake confirmations. Built with patient safety first.',
-    },
-    safety: {
-      disclaimerTitle: 'AI Clinic Receptionist Disclaimer',
-      disclaimerBody: 'SehatSaathi AI is a virtual clinic receptionist. It does not provide medical diagnosis, treatment advice, prescriptions, or dosage recommendations. For medical concerns, please consult a qualified healthcare professional.',
-      emergencyTitle: 'Need urgent medical help?',
-      emergencyBody: 'SehatSaathi AI is not an emergency service. If you or someone with you is experiencing chest pain, severe breathlessness, heavy bleeding, or any life-threatening condition, please call 108 or go to the nearest emergency room immediately.',
-      call108: 'Call 108 Emergency Service',
-    },
-    footer: {
-      tagline: 'SehatSaathi AI — Voice for Bharat Edition · AI Clinic Receptionist',
-      poweredBy: 'Powered by Murf Falcon TTS · Gemini LLM · Deepgram STT · LiveKit Realtime Voice',
-      madeFor: 'Built for 10 Days of Voice Agents — Day 3 Challenge',
-    },
-  },
   hi: {
     badge: 'VOICE FOR BHARAT',
     roleBadge: 'एआई क्लिनिक रिसेप्शनिस्ट',
     heroHeading: 'आपका क्लिनिक। आपकी आवाज़। आपका साथी।',
-    heroSubheading: 'क्लिनिक की जानकारी लेने, अपॉइंटमेंट का अनुरोध करने या डॉक्टर के लिए संदेश छोड़ने के लिए सेहतसाथी एआई से बात करें।',
+    heroSubheading:
+      'क्लिनिक की जानकारी लेने, अपॉइंटमेंट का अनुरोध करने या डॉक्टर के लिए संदेश छोड़ने के लिए सेहतसाथी एआई से बात करें।',
     states: {
       ready: {
         title: 'बात करने के लिए तैयार',
@@ -313,10 +184,13 @@ export const TRANSLATIONS: Record<SupportedLanguage, TranslationDictionary> = {
     },
     errors: {
       micDeniedTitle: 'माइक्रोफ़ोन अनुमति आवश्यक है',
-      micDeniedMessage: 'सेहतसाथी एआई को आपकी आवाज़ सुनने के लिए माइक्रोफ़ोन एक्सेस की आवश्यकता है। कृपया ब्राउज़र सेटिंग्स में अनुमति दें।',
-      micInstructions: 'एड्रेस बार में 🔒 लॉक आइकन पर क्लिक करके माइक्रोफ़ोन को Allow करें और पेज रीफ्रेश करें।',
+      micDeniedMessage:
+        'सेहतसाथी एआई को आपकी आवाज़ सुनने के लिए माइक्रोफ़ोन एक्सेस की आवश्यकता है। कृपया ब्राउज़र सेटिंग्स में अनुमति दें।',
+      micInstructions:
+        'एड्रेस बार में 🔒 लॉक आइकन पर क्लिक करके माइक्रोफ़ोन को Allow करें और पेज रीफ्रेश करें।',
       connectionErrorTitle: 'कनेक्शन स्थापित नहीं हो सका',
-      connectionErrorMessage: 'सेहतसाथी एआई से कनेक्ट करते समय कोई समस्या आई। कृपया अपना इंटरनेट कनेक्शन जांचें और पुनः प्रयास करें।',
+      connectionErrorMessage:
+        'सेहतसाथी एआई से कनेक्ट करते समय कोई समस्या आई। कृपया अपना इंटरनेट कनेक्शन जांचें और पुनः प्रयास करें।',
       connectionTimeoutTitle: 'कनेक्शन टाइमआउट',
       connectionTimeoutMessage: 'सत्र कनेक्ट होने में समय लग रहा है। कृपया अपना नेटवर्क जांचें।',
       retryBtn: 'पुनः प्रयास करें',
@@ -368,7 +242,8 @@ export const TRANSLATIONS: Record<SupportedLanguage, TranslationDictionary> = {
       hoursValue: 'सोमवार – शनिवार · सुबह 9:00 से शाम 7:00 बजे (रविवार बंद)',
       servicesLabel: 'उपलब्ध विभाग',
       servicesList: ['जनरल मेडिसिन', 'बाल रोग (पीडियाट्रिक्स)', 'स्त्री रोग (गाइनेकोलॉजी)'],
-      disclaimer: 'सूचना: अपॉइंटमेंट अनुरोध और संदेश सेहतसाथी एआई द्वारा नोट किए जाते हैं और क्लिनिक कर्मचारियों द्वारा पुष्टि किए जाते हैं।',
+      disclaimer:
+        'सूचना: अपॉइंटमेंट अनुरोध और संदेश सेहतसाथी एआई द्वारा नोट किए जाते हैं और क्लिनिक कर्मचारियों द्वारा पुष्टि किए जाते हैं।',
     },
     requestGuide: {
       title: 'अपॉइंटमेंट अनुरोध प्रक्रिया',
@@ -392,14 +267,17 @@ export const TRANSLATIONS: Record<SupportedLanguage, TranslationDictionary> = {
     },
     safety: {
       disclaimerTitle: 'एआई क्लिनिक रिसेप्शनिस्ट अस्वीकरण',
-      disclaimerBody: 'सेहतसाथी एआई एक वर्चुअल क्लिनिक रिसेप्शनिस्ट है। यह कोई चिकित्सीय निदान, उपचार सलाह, नुस्खे या दवा की खुराक नहीं देती है। चिकित्सीय परामर्श के लिए कृपया योग्य डॉक्टर से संपर्क करें।',
+      disclaimerBody:
+        'सेहतसाथी एआई एक वर्चुअल क्लिनिक रिसेप्शनिस्ट है। यह कोई चिकित्सीय निदान, उपचार सलाह, नुस्खे या दवा की खुराक नहीं देती है। चिकित्सीय परामर्श के लिए कृपया योग्य डॉक्टर से संपर्क करें।',
       emergencyTitle: 'आपातकालीन सहायता की आवश्यकता है?',
-      emergencyBody: 'सेहतसाथी एआई आपातकालीन सेवा नहीं है। यदि सीने में दर्द, सांस लेने में अत्यधिक कठिनाई, या गंभीर चोट जैसी स्थिति है, तो कृपया तुरंत 108 पर कॉल करें या नजदीकी अस्पताल जाएं।',
-      call108: '108 आपातकालीन सेवा पर कॉल करें',
+      emergencyBody:
+        'सेहतसाथी एआई आपातकालीन सेवा नहीं है। यदि कोई चिकित्सीय आपातकाल है, तो कृपया तुरंत स्थानीय आपातकालीन सेवाओं से संपर्क करें या निकटतम अस्पताल जाएं।',
+      call108: 'आपातकालीन चिकित्सा सहायता',
     },
     footer: {
       tagline: 'सेहतसाथी एआई — वॉयस फॉर भारत संस्करण · एआई क्लिनिक रिसेप्शनिस्ट',
-      poweredBy: 'Murf Falcon TTS · Gemini LLM · Deepgram STT · LiveKit Realtime Voice द्वारा संचालित',
+      poweredBy:
+        'Murf Falcon TTS · Gemini LLM · Deepgram STT · LiveKit Realtime Voice द्वारा संचालित',
       madeFor: '10 Days of Voice Agents — Day 3 Challenge',
     },
   },
@@ -407,7 +285,8 @@ export const TRANSLATIONS: Record<SupportedLanguage, TranslationDictionary> = {
     badge: 'VOICE FOR BHARAT',
     roleBadge: 'AI Clinic Receptionist',
     heroHeading: 'Your Clinic. Your Voice. Your Saathi.',
-    heroSubheading: 'Talk naturally with SehatSaathi AI to get clinic information, request an appointment, or leave a message for the clinic team.',
+    heroSubheading:
+      'Talk naturally with SehatSaathi AI to get clinic information, request an appointment, or leave a message for the clinic team.',
     states: {
       ready: {
         title: 'Ready to talk',
@@ -442,12 +321,16 @@ export const TRANSLATIONS: Record<SupportedLanguage, TranslationDictionary> = {
     },
     errors: {
       micDeniedTitle: 'Microphone access is required',
-      micDeniedMessage: 'SehatSaathi AI needs microphone access to hear you. Please allow microphone permission in your browser settings and try again.',
-      micInstructions: 'Click the 🔒 lock icon in your browser address bar, set Microphone to Allow, and refresh the page.',
+      micDeniedMessage:
+        'SehatSaathi AI needs microphone access to hear you. Please allow microphone permission in your browser settings and try again.',
+      micInstructions:
+        'Click the 🔒 lock icon in your browser address bar, set Microphone to Allow, and refresh the page.',
       connectionErrorTitle: "We couldn't connect",
-      connectionErrorMessage: 'Something went wrong while connecting to SehatSaathi AI. Please check your internet connection and try again.',
+      connectionErrorMessage:
+        'Something went wrong while connecting to SehatSaathi AI. Please check your internet connection and try again.',
       connectionTimeoutTitle: 'Connection timed out',
-      connectionTimeoutMessage: 'Connecting is taking longer than expected. Please check your network and try again.',
+      connectionTimeoutMessage:
+        'Connecting is taking longer than expected. Please check your network and try again.',
       retryBtn: 'Try Again',
     },
     controls: {
@@ -477,7 +360,8 @@ export const TRANSLATIONS: Record<SupportedLanguage, TranslationDictionary> = {
       appointment: {
         title: 'Book an Appointment',
         desc: 'Request or reschedule a clinic appointment slot.',
-        samplePrompt: '“I would like to request an appointment for a general checkup tomorrow morning.”',
+        samplePrompt:
+          '“I would like to request an appointment for a general checkup tomorrow morning.”',
       },
       clinicInfo: {
         title: 'Clinic Information',
@@ -497,7 +381,8 @@ export const TRANSLATIONS: Record<SupportedLanguage, TranslationDictionary> = {
       hoursValue: 'Monday – Saturday · 9:00 AM – 7:00 PM (Sunday Closed)',
       servicesLabel: 'Available Departments',
       servicesList: ['General Medicine', 'Pediatrics (Child Health)', 'Gynecology (Women Health)'],
-      disclaimer: 'Note: Appointment requests and doctor messages are recorded by SehatSaathi AI and confirmed directly by Sunrise Family Clinic staff.',
+      disclaimer:
+        'Note: Appointment requests and doctor messages are recorded by SehatSaathi AI and confirmed directly by Sunrise Family Clinic staff.',
     },
     requestGuide: {
       title: 'Appointment Request Flow',
@@ -521,10 +406,12 @@ export const TRANSLATIONS: Record<SupportedLanguage, TranslationDictionary> = {
     },
     safety: {
       disclaimerTitle: 'AI Clinic Receptionist Disclaimer',
-      disclaimerBody: 'SehatSaathi AI is a virtual clinic receptionist. It does not provide medical diagnosis, treatment advice, prescriptions, or dosage recommendations. For medical concerns, please consult a qualified healthcare professional.',
+      disclaimerBody:
+        'SehatSaathi AI is a virtual clinic receptionist. It does not provide medical diagnosis, treatment advice, prescriptions, or dosage recommendations. For medical concerns, please consult a qualified healthcare professional.',
       emergencyTitle: 'Need urgent medical help?',
-      emergencyBody: 'SehatSaathi AI is not an emergency service. If you are experiencing a potentially life-threatening situation (chest pain, severe breathing difficulty, heavy bleeding), seek immediate emergency medical help or call 108.',
-      call108: 'Call 108 Emergency Services',
+      emergencyBody:
+        'SehatSaathi AI is not an emergency service. If you are experiencing a medical emergency, please contact your local emergency services or visit the nearest hospital immediately.',
+      call108: 'Emergency Medical Guidance',
     },
     footer: {
       tagline: 'SehatSaathi AI — Voice for Bharat Edition · AI Clinic Receptionist',
@@ -536,7 +423,8 @@ export const TRANSLATIONS: Record<SupportedLanguage, TranslationDictionary> = {
     badge: 'VOICE FOR BHARAT',
     roleBadge: 'એઆઈ ક્લિનિક રિસેપ્શનિસ્ટ',
     heroHeading: 'તમારી ક્લિનિક. તમારો અવાજ. તમારો સાથી.',
-    heroSubheading: 'ક્લિનિકની માહિતી મેળવવા, એપોઇન્ટમેન્ટની વિનંતી કરવા અથવા ડૉક્ટર માટે સંદેશ આપવા માટે સેહતસાથી એઆઈ સાથે વાત કરો.',
+    heroSubheading:
+      'ક્લિનિકની માહિતી મેળવવા, એપોઇન્ટમેન્ટની વિનંતી કરવા અથવા ડૉક્ટર માટે સંદેશ આપવા માટે સેહતસાથી એઆઈ સાથે વાત કરો.',
     states: {
       ready: {
         title: 'વાત કરવા માટે તૈયાર',
@@ -571,10 +459,13 @@ export const TRANSLATIONS: Record<SupportedLanguage, TranslationDictionary> = {
     },
     errors: {
       micDeniedTitle: 'માઇક્રોફોન પરવાનગી જરૂરી છે',
-      micDeniedMessage: 'સેહતસાથી એઆઈને તમારો અવાજ સાંભળવા માટે માઇક્રોફોન એક્સેસની જરૂર છે. કૃપા કરીને બ્રાઉઝર સેટિંગ્સમાં પરવાનગી આપો.',
-      micInstructions: 'એડ્રેસ બારમાં 🔒 લોક આઇકોન પર ક્લિક કરીને માઇક્રોફોન Allow કરો અને પેજ રિફ્રેશ કરો.',
+      micDeniedMessage:
+        'સેહતસાથી એઆઈને તમારો અવાજ સાંભળવા માટે માઇક્રોફોન એક્સેસની જરૂર છે. કૃપા કરીને બ્રાઉઝર સેટિંગ્સમાં પરવાનગી આપો.',
+      micInstructions:
+        'એડ્રેસ બારમાં 🔒 લોક આઇકોન પર ક્લિક કરીને માઇક્રોફોન Allow કરો અને પેજ રિફ્રેશ કરો.',
       connectionErrorTitle: 'કનેક્ટ થઈ શક્યું નથી',
-      connectionErrorMessage: 'કનેક્ટ કરતી વખતે સમસ્યા આવી. કૃપા કરીને તમારું ઇન્ટરનેટ કનેક્શન તપાસો.',
+      connectionErrorMessage:
+        'કનેક્ટ કરતી વખતે સમસ્યા આવી. કૃપા કરીને તમારું ઇન્ટરનેટ કનેક્શન તપાસો.',
       connectionTimeoutTitle: 'કનેક્શન સમયસમાપ્તિ',
       connectionTimeoutMessage: 'કનેક્ટ થવામાં સમય લાગી રહ્યો છે. કૃપા કરીને નેટવર્ક તપાસો.',
       retryBtn: 'ફરી પ્રયાસ કરો',
@@ -626,7 +517,8 @@ export const TRANSLATIONS: Record<SupportedLanguage, TranslationDictionary> = {
       hoursValue: 'સોમવાર – શનિવાર · સવારે 9:00 થી સાંજે 7:00 (રવિવાર બંધ)',
       servicesLabel: 'ઉપલબ્ધ વિભાગો',
       servicesList: ['જનરલ મેડિસિન', 'બાળ રોગ (પીડિયાટ્રિક્સ)', 'સ્ત્રી રોગ (ગાયનેકોલોજી)'],
-      disclaimer: 'સૂચના: એપોઇન્ટમેન્ટ વિનંતીઓ સેહતસાથી એઆઈ દ્વારા નોંધવામાં આવે છે અને ક્લિનિક સ્ટાફ દ્વારા પુષ્ટિ થાય છે.',
+      disclaimer:
+        'સૂચના: એપોઇન્ટમેન્ટ વિનંતીઓ સેહતસાથી એઆઈ દ્વારા નોંધવામાં આવે છે અને ક્લિનિક સ્ટાફ દ્વારા પુષ્ટિ થાય છે.',
     },
     requestGuide: {
       title: 'એપોઇન્ટમેન્ટ પ્રક્રિયા',
@@ -650,14 +542,17 @@ export const TRANSLATIONS: Record<SupportedLanguage, TranslationDictionary> = {
     },
     safety: {
       disclaimerTitle: 'એઆઈ ક્લિનિક રિસેપ્શનિસ્ટ ડિસ્ક્લેમર',
-      disclaimerBody: 'સેહતસાથી એઆઈ એક વર્ચ્યુઅલ ક્લિનિક રિસેપ્શનિસ્ટ છે. તે કોઈ રોગનિદાન, સારવાર સલાહ અથવા દવાઓની ભલામણ કરતી નથી. તબીબી સલાહ માટે કૃપા કરીને યોગ્ય ડૉક્ટરનો સંપર્ક કરો.',
+      disclaimerBody:
+        'સેહતસાથી એઆઈ એક વર્ચ્યુઅલ ક્લિનિક રિસેપ્શનિસ્ટ છે. તે કોઈ રોગનિદાન, સારવાર સલાહ અથવા દવાઓની ભલામણ કરતી નથી. તબીબી સલાહ માટે કૃપા કરીને યોગ્ય ડૉક્ટરનો સંપર્ક કરો.',
       emergencyTitle: 'ઇમરજન્સી સહાયની જરૂર છે?',
-      emergencyBody: 'સેહતસાથી એઆઈ કટોકટી સેવા નથી. છાતીમાં દુખાવો કે શ્વાસ લેવામાં ગંભીર તકલીફ હોય તો કૃપા કરીને તરત 108 પર કૉલ કરો અથવા નજીકની હોસ્પિટલ પહોંચો.',
-      call108: '108 ઇમરજન્સી સેવા પર કૉલ કરો',
+      emergencyBody:
+        'સેહતસાથી એઆઈ કટોકટી સેવા નથી. જો કોઈ તબીબી કટોકટી હોય, તો કૃપા કરીને તરત જ સ્થાનિક કટોકટી સેવાઓનો સંપર્ક કરો અથવા નજીકની હોસ્પિટલ પહોંચો.',
+      call108: 'ઇમરજન્સી તબીબી સહાય',
     },
     footer: {
       tagline: 'સેહતસાથી એઆઈ — વૉઇસ ફોર ભારત એડિશન · એઆઈ ક્લિનિક રિસેપ્શનિસ્ટ',
-      poweredBy: 'Murf Falcon TTS · Gemini LLM · Deepgram STT · LiveKit Realtime Voice દ્વારા સંચાલિત',
+      poweredBy:
+        'Murf Falcon TTS · Gemini LLM · Deepgram STT · LiveKit Realtime Voice દ્વારા સંચાલિત',
       madeFor: 'Built for 10 Days of Voice Agents — Day 3 Challenge',
     },
   },

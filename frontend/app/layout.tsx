@@ -76,10 +76,8 @@ export default async function RootLayout({ children }: RootLayoutProps) {
       suppressHydrationWarning
       className={cn(inter.variable, poppins.variable, commitMono.variable, 'antialiased')}
     >
-      <head>
-        {styles && <style>{styles}</style>}
-      </head>
-      <body className="overflow-x-hidden font-sans min-h-screen bg-background text-foreground transition-colors duration-300">
+      <head>{styles && <style>{styles}</style>}</head>
+      <body className="bg-background text-foreground min-h-screen overflow-x-hidden font-sans transition-colors duration-300">
         <ThemeProvider
           attribute="class"
           defaultTheme="light"

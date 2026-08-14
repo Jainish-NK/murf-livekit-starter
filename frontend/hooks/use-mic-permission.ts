@@ -2,7 +2,13 @@
 
 import { useCallback, useState } from 'react';
 
-export type MicPermissionStatus = 'idle' | 'requesting' | 'granted' | 'denied' | 'no-device' | 'error';
+export type MicPermissionStatus =
+  | 'idle'
+  | 'requesting'
+  | 'granted'
+  | 'denied'
+  | 'no-device'
+  | 'error';
 
 export type MicPermissionResult =
   | { ok: true }

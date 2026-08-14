@@ -1,9 +1,9 @@
 'use client';
 
 import { Mic } from 'lucide-react';
-import { cn } from '@/lib/shadcn/utils';
-import type { UIState } from '@/hooks/use-ui-state';
 import { usePrefersReducedMotion } from '@/hooks/use-prefers-reduced-motion';
+import type { UIState } from '@/hooks/use-ui-state';
+import { cn } from '@/lib/shadcn/utils';
 
 interface VoiceOrbProps {
   uiState: UIState;
@@ -52,22 +52,22 @@ export function VoiceOrb({ uiState, volume = 0, className, size = 180 }: VoiceOr
         <>
           {/* Top-Right Saffron particle */}
           <span
-            className="absolute top-1 right-3 size-2 sm:size-2.5 rounded-full bg-saffron opacity-85 ss-animate-float"
+            className="bg-saffron ss-animate-float absolute top-1 right-3 size-2 rounded-full opacity-85 sm:size-2.5"
             style={{ animationDelay: '0.2s' }}
           />
           {/* Bottom-Left Green particle */}
           <span
-            className="absolute bottom-2 left-2 size-1.5 sm:size-2 rounded-full bg-green opacity-80 ss-animate-float"
+            className="bg-green ss-animate-float absolute bottom-2 left-2 size-1.5 rounded-full opacity-80 sm:size-2"
             style={{ animationDelay: '1.2s' }}
           />
           {/* Top-Left Tiny White particle */}
           <span
-            className="absolute top-4 left-1 size-1.5 rounded-full bg-white shadow-xs opacity-90 ss-animate-float"
+            className="ss-animate-float absolute top-4 left-1 size-1.5 rounded-full bg-white opacity-90 shadow-xs"
             style={{ animationDelay: '2.4s' }}
           />
           {/* Bottom-Right Saffron particle */}
           <span
-            className="absolute bottom-4 right-1 size-1.5 sm:size-2 rounded-full bg-saffron opacity-80 ss-animate-float"
+            className="bg-saffron ss-animate-float absolute right-1 bottom-4 size-1.5 rounded-full opacity-80 sm:size-2"
             style={{ animationDelay: '1.8s' }}
           />
         </>
@@ -82,13 +82,12 @@ export function VoiceOrb({ uiState, volume = 0, className, size = 180 }: VoiceOr
         style={{
           background:
             'conic-gradient(from 0deg, #FF9933 0%, #FFAA4D 20%, #FFFFFF 38%, #F8FAFC 52%, #10B981 70%, #138808 85%, #FF9933 100%)',
-          boxShadow:
-            '0 0 16px rgba(255, 153, 51, 0.35), 0 0 24px rgba(19, 136, 8, 0.3)',
+          boxShadow: '0 0 16px rgba(255, 153, 51, 0.35), 0 0 24px rgba(19, 136, 8, 0.3)',
           transform: `scale(${1 + clamped * 0.08})`,
         }}
       >
         {/* Inner masking layer creating the sleek glowing 3D border ring */}
-        <div className="w-full h-full rounded-full bg-surface-soft dark:bg-background" />
+        <div className="bg-surface-soft dark:bg-background h-full w-full rounded-full" />
       </div>
 
       {/* 4. Secondary Counter-Rotating Subtle Ring for 3D depth */}
@@ -125,11 +124,11 @@ export function VoiceOrb({ uiState, volume = 0, className, size = 180 }: VoiceOr
         }}
       >
         {/* Specular Highlight for 3D sphere depth */}
-        <div className="absolute top-2 left-3 w-7 h-3 rounded-full bg-white/40 blur-2xs" />
+        <div className="blur-2xs absolute top-2 left-3 h-3 w-7 rounded-full bg-white/40" />
 
         {/* White Centered Microphone Icon */}
         <Mic
-          className="size-7 sm:size-8 text-white transition-transform duration-200"
+          className="size-7 text-white transition-transform duration-200 sm:size-8"
           style={{
             transform: `scale(${1 + clamped * 0.12})`,
           }}

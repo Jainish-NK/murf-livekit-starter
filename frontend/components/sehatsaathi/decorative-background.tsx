@@ -1,24 +1,25 @@
 'use client';
 
-import { usePrefersReducedMotion } from '@/hooks/use-prefers-reduced-motion';
 import { DotGrid } from '@/components/sehatsaathi/dot-grid';
+import { usePrefersReducedMotion } from '@/hooks/use-prefers-reduced-motion';
 
 export function DecorativeBackground() {
   const reducedMotion = usePrefersReducedMotion();
 
   return (
-    <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden select-none" aria-hidden="true">
+    <div
+      className="pointer-events-none fixed inset-0 z-0 overflow-hidden select-none"
+      aria-hidden="true"
+    >
       {/* 1. Structural Dot Grid for 3D depth */}
       <DotGrid opacity={0.25} />
 
       {/* 2. Centered Ambient 3D Glowing Radial Backlight */}
-      <div
-        className="pointer-events-none absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-[650px] h-[650px] rounded-full blur-[130px] transition-all duration-1000 z-0 bg-gradient-to-tr from-green/18 via-saffron/14 to-transparent"
-      />
+      <div className="from-green/18 via-saffron/14 pointer-events-none absolute top-1/3 left-1/2 z-0 h-[650px] w-full max-w-[650px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-gradient-to-tr to-transparent blur-[130px] transition-all duration-1000" />
 
       {/* 3. Top-Left Flowing Tricolor Ribbon Graphic */}
       <svg
-        className="absolute -top-12 -left-12 w-[340px] h-[340px] sm:w-[480px] sm:h-[480px] opacity-45 dark:opacity-25"
+        className="absolute -top-12 -left-12 h-[340px] w-[340px] opacity-45 sm:h-[480px] sm:w-[480px] dark:opacity-25"
         viewBox="0 0 500 500"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
@@ -60,7 +61,7 @@ export function DecorativeBackground() {
 
       {/* 4. Left Ashoka Chakra Watermark (Behind Hero Heading) */}
       <svg
-        className={`absolute top-[16%] -left-16 w-[320px] h-[320px] sm:w-[420px] sm:h-[420px] text-navy-text/5 dark:text-white/5 ${
+        className={`text-navy-text/5 absolute top-[16%] -left-16 h-[320px] w-[320px] sm:h-[420px] sm:w-[420px] dark:text-white/5 ${
           !reducedMotion ? 'ss-animate-spin-3d' : ''
         }`}
         viewBox="0 0 200 200"
@@ -86,7 +87,7 @@ export function DecorativeBackground() {
 
       {/* 5. Right Ashoka Chakra Watermark (Behind Transcript Panel, bleeding off right edge) */}
       <svg
-        className={`absolute top-[26%] -right-24 w-[420px] h-[420px] sm:w-[540px] sm:h-[540px] text-navy-text/4 dark:text-white/4 ${
+        className={`text-navy-text/4 absolute top-[26%] -right-24 h-[420px] w-[420px] sm:h-[540px] sm:w-[540px] dark:text-white/4 ${
           !reducedMotion ? 'ss-animate-spin-3d' : ''
         }`}
         viewBox="0 0 200 200"
@@ -111,9 +112,9 @@ export function DecorativeBackground() {
       </svg>
 
       {/* 6. Bottom Monument Skyline Silhouette (India Gate / Taj Mahal) */}
-      <div className="absolute bottom-0 left-0 right-0 h-28 opacity-18 dark:opacity-10 flex items-end">
+      <div className="absolute right-0 bottom-0 left-0 flex h-28 items-end opacity-18 dark:opacity-10">
         <svg
-          className="w-full h-24 text-navy-text dark:text-white"
+          className="text-navy-text h-24 w-full dark:text-white"
           viewBox="0 0 1200 120"
           fill="currentColor"
           preserveAspectRatio="none"
@@ -160,7 +161,7 @@ export function DecorativeBackground() {
 
       {/* 7. Soft Green Wave in Bottom-Right Corner */}
       <svg
-        className="absolute -bottom-8 -right-8 w-[280px] h-[280px] sm:w-[380px] sm:h-[380px] opacity-40 dark:opacity-20"
+        className="absolute -right-8 -bottom-8 h-[280px] w-[280px] opacity-40 sm:h-[380px] sm:w-[380px] dark:opacity-20"
         viewBox="0 0 400 400"
         fill="none"
       >
