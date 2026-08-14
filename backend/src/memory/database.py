@@ -88,10 +88,35 @@ def init_database() -> None:
                 outcome TEXT,
                 failure_reason TEXT,
                 success_reason TEXT,
+                handoff_count INTEGER DEFAULT 0,
+                specialist_used TEXT,
+                agent_path TEXT,
+                handoff_status TEXT,
+                specialist_task TEXT,
                 created_at TEXT
             )
             """
         )
+
+        # Ensure newly added columns exist in older database files
+        existing_cols = {
+            col[1]
+            for col in connection.execute("PRAGMA table_info(call_analytics)").fetchall()
+        }
+        for col_name, col_type in [
+            ("handoff_count", "INTEGER DEFAULT 0"),
+            ("specialist_used", "TEXT"),
+            ("agent_path", "TEXT"),
+            ("handoff_status", "TEXT"),
+            ("specialist_task", "TEXT"),
+        ]:
+            if col_name not in existing_cols:
+                try:
+                    connection.execute(
+                        f"ALTER TABLE call_analytics ADD COLUMN {col_name} {col_type}"
+                    )
+                except Exception:
+                    pass
 
         connection.commit()
 

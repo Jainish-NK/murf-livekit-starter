@@ -18,6 +18,7 @@ if str(_backend_dir) not in sys.path:
 from dotenv import load_dotenv
 from livekit import rtc
 from livekit.agents import (
+    NOT_GIVEN,
     Agent,
     AgentServer,
     AgentSession,
@@ -48,6 +49,7 @@ try:
         record_medication_intake,
         schedule_followup_reminder,
     )
+    from tools.handoff_tools import transfer_to_clinic_specialist
 except ImportError:
     from src.memory.memory_service import (
         lookup_caller,
@@ -64,6 +66,7 @@ except ImportError:
         record_medication_intake,
         schedule_followup_reminder,
     )
+    from src.tools.handoff_tools import transfer_to_clinic_specialist
 
 logger = logging.getLogger("agent")
 
@@ -75,9 +78,10 @@ SYSTEM_PROMPT = """
 You are Anisha, the warm, empathetic, and professional AI voice assistant for Sunrise Family Clinic and the SehatSaathi Healthcare Access Service.
 You work for the clinic. You are a healthcare access assistant, NOT a doctor, nurse, pharmacist, or medical practitioner.
 Your role is to make it easier for patients to access healthcare by:
-1. Handling Inbound Calls (appointments, clinic information, healthcare facility lookup, messages for doctors).
-2. Handling Proactive Outbound Calls (medication reminders, vaccination reminders, triage follow-ups).
-3. Handling Human Escalation when clinical safety or diagnosis boundaries are reached.
+1. Handling Inbound Calls (answering general health queries, directing clinic services, healthcare facility lookup, messages for doctors).
+2. Routing Specialized Appointment Tasks to the dedicated Clinic & Appointment Specialist.
+3. Handling Proactive Outbound Calls (medication reminders, vaccination reminders, triage follow-ups).
+4. Handling Human Escalation when clinical safety or diagnosis boundaries are reached.
 
 You must always remain in the role of a clinic assistant.
 
@@ -93,6 +97,37 @@ You must always remain in the role of a clinic assistant.
 - English should remain in standard English.
 - If the caller code-mixes Hindi and English, respond in a natural mix using Devanagari for Hindi words and Latin script for English words.
 - Keep spoken replies concise: 1 to 2 short, natural sentences at a time.
+
+
+# MULTI-AGENT ROUTING & HANDOFF (DAY 9 — HEALTH ACCESS TRACK)
+
+You are the primary assistant and routing authority.
+
+## WHEN TO TRANSFER TO CLINIC & APPOINTMENT SPECIALIST:
+Call `transfer_to_clinic_specialist` when the caller asks for:
+- Doctor appointment booking (e.g., "मुझे कल डॉक्टर की appointment चाहिए।", "I want to book an appointment with Dr. Sharma.")
+- Doctor availability and schedules (e.g., "क्या Dr. Sharma कल available हैं?", "When is the pediatrician available?")
+- Clinic opening/closing timings or department services (e.g., "क्लिनिक कितने बजे खुलता है?", "What services does the clinic have?")
+- Rescheduling an existing appointment (e.g., "मुझे अपनी appointment reschedule करनी है।")
+- Cancelling an existing appointment (e.g., "How can I cancel my appointment?")
+
+Before or during handoff, announce clearly to the caller:
+- In Hindi: "ज़रूर। मैं आपको हमारे Clinic और Appointment Specialist से connect करती हूँ।"
+- In English: "Sure. I'll connect you with our Clinic and Appointment Specialist."
+Pass extracted doctor preference, requested date, preferred time, and intent into `transfer_to_clinic_specialist`.
+
+## WHEN TO REMAIN WITH MAIN AGENT (DO NOT HAND OFF):
+Do NOT transfer the user for general queries, such as:
+- Healthy breakfast and nutrition questions (e.g., "मुझे healthy breakfast के बारे में बताइए।")
+- General hydration and health tips (e.g., "मुझे पानी कितना पीना चाहिए?")
+- Common illness guidance and fever care tips (e.g., "मुझे basic fever information चाहिए।")
+- Greeting and capabilities (e.g., "Hello", "आप क्या कर सकते हैं?")
+Answer these directly, safely, and empathetically.
+
+## CRITICAL SAFETY PRIORITY (SAFETY > SPECIALIST ROUTING):
+If the caller presents serious/red-flag symptoms OR asks for a medical diagnosis, even if they mention the word "appointment" or "doctor" (e.g., "मुझे बहुत तेज़ chest pain है और appointment चाहिए।", "Can you diagnose me?"):
+- DO NOT transfer directly to the Clinic Specialist!
+- Immediately invoke safety triage (`check_triage_level`) and follow the mandatory Day 7 Human Escalation / Emergency safety protocol below.
 
 
 # HUMAN ESCALATION & MEDICAL SAFETY (DAY 7 — HEALTH ACCESS TRACK)
@@ -156,7 +191,7 @@ Before calling `create_escalation`:
 - NEVER include passwords, OTPs, PINs, credit/debit card numbers, bank account numbers, auth tokens, API keys, or unnecessary secrets in the escalation summary.
 
 ### General Queries (No Escalation):
-- Do NOT escalate normal questions unnecessarily (e.g. "What are some healthy breakfast options?", clinic hours, appointment requests, general dietary questions). Respond normally.
+- Do NOT escalate normal questions unnecessarily (e.g. "What are some healthy breakfast options?", clinic hours, general dietary questions). Respond normally.
 
 
 # INBOUND CALLS (DAY 1–5 OBJECTIVES)
@@ -166,20 +201,10 @@ Greet callers warmly:
 > "Hello! Welcome to Sunrise Family Clinic. I'm Anisha, your virtual receptionist. May I know your name and how I can help you today?"
 (या हिंदी में: "नमस्ते! Sunrise Family Clinic में आपका स्वागत है। मैं Anisha हूँ। मैं आज आपकी क्या सहायता कर सकती हूँ?")
 
-## 2. Appointment Assistance
-Help caller make an appointment request or reschedule request.
-Collect: Caller name, Reason for visit, Preferred date, Preferred time, Preferred doctor/department.
-You can record an appointment request, but you must NEVER claim that an appointment is confirmed unless the system explicitly confirms it.
-
-## 3. Clinic Information
-- Clinic: Sunrise Family Clinic
-- Opening hours: Monday to Saturday, 9:00 AM to 7:00 PM
-- Services/Departments: General Medicine, Pediatrics, Gynecology
-
-## 4. Healthcare Facility Lookup
+## 2. Healthcare Facility Lookup
 - If caller asks for nearby clinics, hospitals, or PHCs in a locality or district, use `find_nearby_healthcare_facility`.
 
-## 5. Doctor Message
+## 3. Doctor Message
 If caller wants to leave a message for a doctor, collect: Caller name, Message reason, Preferred callback info.
 
 
@@ -222,6 +247,7 @@ If patient requests callback at a specific time, call `schedule_followup_reminde
 
 
 # TOOL USAGE DISCRETION
+- `transfer_to_clinic_specialist`: Use when caller requests doctor appointments, rescheduling, cancellations, availability, or clinic timings.
 - `check_triage_level`: Use when symptoms require triage.
 - `create_escalation`: Use ONLY after explicit caller consent for human escalation.
 - `find_nearby_healthcare_facility`: Use when caller asks for healthcare facilities.
@@ -236,12 +262,45 @@ class MemoryFact(BaseModel):
     value: str = Field(description="The value of the fact, e.g., 'morning' or 'Dr. Sharma'")
 
 
+def create_main_tts():
+    """
+    Configure the Main SehatSaathi Assistant with the Murf Anisha voice.
+    """
+    if not os.environ.get("MURF_API_KEY"):
+        return NOT_GIVEN
+
+    return murf.TTS(
+        voice="Anisha",
+        style="Conversation",
+        tokenizer=tokenize.basic.SentenceTokenizer(min_sentence_len=2),
+        text_pacing=True,
+    )
+
+
 class Assistant(Agent):
 
-    def __init__(self, user_id: str | None = None) -> None:
+    def __init__(
+        self,
+        user_id: str | None = None,
+        returned_context: str | None = None,
+        return_reason: str | None = None,
+    ) -> None:
+        instructions = SYSTEM_PROMPT
+        if returned_context or return_reason:
+            instructions += "\n\n# RETURNED FROM CLINIC SPECIALIST CONTEXT\n"
+            if return_reason:
+                instructions += f"- Handback Reason: {return_reason}\n"
+            if returned_context:
+                instructions += f"- Specialist Notes: {returned_context}\n"
+            instructions += "\nIMPORTANT: The caller has returned to you from the clinic specialist. Continue helping smoothly without asking them to repeat."
+
+        main_tts = create_main_tts()
+
         super().__init__(
-            instructions=SYSTEM_PROMPT,
+            instructions=instructions,
+            tts=main_tts,
             tools=[
+                transfer_to_clinic_specialist,
                 check_triage_level,
                 find_nearby_healthcare_facility,
                 create_escalation,
@@ -455,6 +514,30 @@ async def my_agent(ctx: JobContext):
                     session.userdata["success"] = True
                     session.userdata["success_reason"] = "CLINIC_INFORMATION"
                     session.userdata["details"] = "Saved caller preferences to memory"
+                elif tool_name == "transfer_to_clinic_specialist":
+                    session.userdata["success"] = True
+                    session.userdata["success_reason"] = "CLINIC_INFORMATION"
+                    session.userdata["details"] = "Transferred to Clinic & Appointment Specialist"
+                elif tool_name == "book_appointment":
+                    session.userdata["success"] = True
+                    session.userdata["success_reason"] = "APPOINTMENT_BOOKED"
+                    session.userdata["details"] = "Booked appointment with clinic doctor"
+                elif tool_name == "reschedule_appointment":
+                    session.userdata["success"] = True
+                    session.userdata["success_reason"] = "APPOINTMENT_RESCHEDULED"
+                    session.userdata["details"] = "Rescheduled clinic appointment"
+                elif tool_name == "cancel_appointment":
+                    session.userdata["success"] = True
+                    session.userdata["success_reason"] = "APPOINTMENT_CANCELLED"
+                    session.userdata["details"] = "Cancelled clinic appointment"
+                elif tool_name == "get_clinic_info_and_timings":
+                    session.userdata["success"] = True
+                    session.userdata["success_reason"] = "CLINIC_INFORMATION"
+                    session.userdata["details"] = "Provided clinic timings and doctor schedules"
+                elif tool_name == "check_doctor_availability":
+                    session.userdata["success"] = True
+                    session.userdata["success_reason"] = "CLINIC_INFORMATION"
+                    session.userdata["details"] = "Checked doctor availability schedule"
             else:
                 session.userdata["success"] = False
                 session.userdata["failure_reason"] = "TOOL_FAILURE"
@@ -490,7 +573,12 @@ async def my_agent(ctx: JobContext):
             outcome=outcome,
             failure_reason=failure_reason,
             success_reason=success_reason,
-            language=language
+            language=language,
+            handoff_count=session.userdata.get("handoff_count", 0),
+            specialist_used=session.userdata.get("specialist_used"),
+            agent_path=session.userdata.get("agent_path", "Main"),
+            handoff_status=session.userdata.get("handoff_status"),
+            specialist_task=session.userdata.get("specialist_task"),
         )
 
     # Join the room and connect
@@ -520,7 +608,7 @@ async def my_agent(ctx: JobContext):
         else:
             call_mode = "browser"
 
-    # Populate session userdata for tools and context without breaking Day 1-6
+    # Populate session userdata for tools and context without breaking Day 1-8
     session.userdata = {
         "caller_id": caller_id,
         "phone_number": outbound_meta.get("phone_number", caller_id),
@@ -533,6 +621,12 @@ async def my_agent(ctx: JobContext):
         "success_reason": None,
         "failure_reason": "INCOMPLETE_TASK",
         "language": "Unknown",
+        "handoff_state": "MAIN",
+        "handoff_count": 0,
+        "specialist_used": None,
+        "agent_path": "Main",
+        "handoff_status": None,
+        "specialist_task": None,
     }
 
     try:

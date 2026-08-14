@@ -498,6 +498,38 @@ cd backend
 uv run pytest tests/
 ```
 
+## Day 9 – Multi-Agent Handoff System
+
+Day 9 introduces a production-quality multi-agent handoff architecture powered by LiveKit Agents. The system separates broad healthcare reception and safety governance from deep clinic appointment workflows while keeping context unified.
+
+### 1. Multi-Agent Architecture
+- **Main Agent (Anisha)**: Acts as the primary conversational interface, healthcare guidance agent, and safety/triage/routing authority.
+- **Clinic & Appointment Specialist**: Narrow-responsibility specialist handling clinic timings, doctor schedules, appointment bookings, rescheduling, cancellations, and status lookups.
+- **Bidirectional Handoff**: The Main Agent hands off to the Clinic Specialist via `transfer_to_clinic_specialist()`, and the Specialist hands back via `handback_to_main_agent()` when out-of-scope health queries or completed workflows occur.
+
+### 2. Context Preservation (`HandoffContext`)
+When transferring between agents, structured context is passed without repeating requests or passing raw transcripts:
+- User Intent / Request
+- Doctor preference (e.g. Dr. Sharma, Dr. Priya Sharma, Dr. Rajesh Patel)
+- Requested date & preferred time slot
+- Spoken language (Hindi Devanagari / English)
+- Relevant consented memory
+- Strict privacy filters (passwords, PINs, OTPs, cards, and full transcripts are excluded)
+
+### 3. Explicit Handoff State Model & Loop Guard
+States: `MAIN`, `HANDOFF_REQUESTED`, `SPECIALIST_ACTIVE`, `TASK_COMPLETED`, `HAND_BACK_TO_MAIN`, `HANDOFF_FAILED`.
+Loop prevention tracks transition counts and enforces limits to prevent ping-pong transitions.
+
+### 4. Safety First (Safety > Specialist Routing)
+Emergency red-flags (chest pain, breathlessness, heavy bleeding) or diagnosis requests are NEVER routed directly to the appointment specialist. The Main Agent immediately executes safety triage (`check_triage_level`) and the Day 7 human escalation protocol. If the specialist detects safety issues, it hands back to Main Agent immediately.
+
+### 5. Running Day 9 Tests
+```bash
+cd backend
+uv run pytest tests/
+```
+All 43 unit and integration tests validate routing, context preservation, handback, safety priority, privacy sanitization, and specialist appointment tools.
+
 ---
 
 ## Links

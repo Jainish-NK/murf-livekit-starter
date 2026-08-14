@@ -97,9 +97,14 @@ def log_call_end(
     failure_reason: str | None = None,
     success_reason: str | None = None,
     language: str | None = None,
+    handoff_count: int = 0,
+    specialist_used: str | None = None,
+    agent_path: str | None = None,
+    handoff_status: str | None = None,
+    specialist_task: str | None = None,
 ) -> None:
     """
-    Compute call duration and record final status, outcome, and metadata.
+    Compute call duration and record final status, outcome, and metadata including handoffs.
     """
     init_database()
     now = datetime.now(timezone.utc)
@@ -128,7 +133,12 @@ def log_call_end(
                 outcome = ?,
                 failure_reason = ?,
                 success_reason = ?,
-                language = COALESCE(?, language)
+                language = COALESCE(?, language),
+                handoff_count = ?,
+                specialist_used = ?,
+                agent_path = ?,
+                handoff_status = ?,
+                specialist_task = ?
             WHERE call_id = ?
             """,
             (
@@ -138,6 +148,11 @@ def log_call_end(
                 failure_reason if outcome == "failed" else None,
                 success_reason if outcome == "success" else None,
                 language,
+                handoff_count,
+                specialist_used,
+                agent_path,
+                handoff_status,
+                specialist_task,
                 call_id,
             ),
         )
@@ -158,6 +173,16 @@ def get_call_analytics() -> dict[str, Any]:
             "SELECT COUNT(*) FROM call_analytics WHERE outcome = 'failed'"
         ).fetchone()[0]
 
+        total_handoffs = conn.execute(
+            "SELECT COALESCE(SUM(handoff_count), 0) FROM call_analytics"
+        ).fetchone()[0]
+        successful_handoffs = conn.execute(
+            "SELECT COUNT(*) FROM call_analytics WHERE handoff_status = 'SUCCESS'"
+        ).fetchone()[0]
+        failed_handoffs = conn.execute(
+            "SELECT COUNT(*) FROM call_analytics WHERE handoff_status = 'FAILED'"
+        ).fetchone()[0]
+
         success_rate = 0
         if total > 0:
             success_rate = int((successful / total) * 100)
@@ -167,6 +192,9 @@ def get_call_analytics() -> dict[str, Any]:
             "successful_calls": successful,
             "failed_calls": failed,
             "success_rate": success_rate,
+            "total_handoffs": int(total_handoffs),
+            "successful_handoffs": int(successful_handoffs),
+            "failed_handoffs": int(failed_handoffs),
         }
 
 
@@ -178,7 +206,8 @@ def get_call_history() -> list[dict[str, Any]]:
     with get_connection() as conn:
         rows = conn.execute(
             """
-            SELECT call_id, caller_id, call_mode, language, start_time, end_time, duration, status, outcome, failure_reason, success_reason
+            SELECT call_id, caller_id, call_mode, language, start_time, end_time, duration, status, outcome, failure_reason, success_reason,
+                   handoff_count, specialist_used, agent_path, handoff_status, specialist_task
             FROM call_analytics
             ORDER BY start_time DESC
             LIMIT 50
@@ -323,8 +352,16 @@ def classify_call_outcome(
     )
     user_declined = any(w in user_text for w in ["नहीं", "don't", "no", "stop", "बंद"])
 
+    assistant_text = " ".join(assistant_messages).lower()
+    has_apt_confirmation = any(
+        kw in assistant_text
+        for kw in ["apt-", "confirmed", "rescheduled", "cancelled", "पुष्टि", "तय", "रद्द"]
+    )
+
     if assistant_offered_escalation and user_declined:
         return "failed", None, "INCOMPLETE_TASK", "User declined human escalation offer"
+    elif has_appointment_query and has_apt_confirmation:
+        return "success", "APPOINTMENT_BOOKED", None, "Appointment request completed successfully"
     elif has_appointment_query:
         return "failed", None, "INCOMPLETE_TASK", "Appointment request initiated but incomplete"
     elif assistant_messages and has_guidance_query:
